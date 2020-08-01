@@ -217,3 +217,14 @@ def write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartco
 
     print('Output written to {}'.format(outputfile))
     return
+
+#Wrapper functiom
+def parse_logfile(scan, logfile, overwrite, full, no_energy, last_frame, post_hartree_fock, outfile):
+
+    check_post_hartree_fock(post_hartree_fock)
+
+    cartcoords, step_num, energy = read_log_into_lists(logfile, post_hartree_fock)
+
+    save_frames = determine_and_save_frames(scan, full, step_num)
+
+    write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartcoords, step_num, energy)
