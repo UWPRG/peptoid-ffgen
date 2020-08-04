@@ -1,0 +1,42 @@
+;  ### CONTENTS ### 
+; STM - (middle polymer)
+; STN - (CH3 terminated n-term) **BACKWARDS**
+; STC - (CH3 terminated c-term) **BACKWARDS**
+
+; STM (MIDDLE)
+;
+;           HB1
+;           |
+;    HB2 -- CBP -- HB3
+;           |
+; \--CLP -- NL -- CA --\
+;    ||
+;    OL
+
+[ STM ]
+ [ atoms ]
+           CLP   TC    0.51 0
+           OL    O    -0.51 1
+           NL    NH1  -0.42 2
+           CBP   CT3  -0.06 3
+           HB1   HA3   0.09 4
+           HB2   HA3   0.09 5
+           HB3   HA3   0.09 6
+           CAP   CT2   0.03 7
+           HA1   HB2   0.09 8 ; this was HB1 before
+           HA2   HB2   0.09 9 ; this was HB1 before
+ [ bonds ]
+     CLP   -CAP
+           CLP   OL
+           CLP   NL
+           NL    CAP
+           NL    CBP
+           CAP    HA1
+           CAP    HA2
+           CBP    HB1
+           CBP    HB2
+           CBP    HB3
+           CAP    +CLP
+ [ impropers ]
+           CLP  -CAP   NL  OL
+           NL    CLP  CAP  CBP

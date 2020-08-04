@@ -116,3 +116,82 @@ def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index=1,
         outfile.write(header+write_string+footer)
 
     return
+
+## Functions for running MD on GROMACS
+
+def grompp(mpirun, mdp, coord, tpr, index="index.ndx", topol="topol.top",
+           maxwarn=1, np=1, logfile="stdout.log"):
+    """
+    Python wrapper for gmx grompp
+
+    Inputs
+    mpirun : Bool
+        Is this a multi-node run or not (gmx vs gmx_mpi), if True must specify
+        number of processes (np)
+    mdp : str
+        Filename of .mdp file
+    coord : str
+        Filename of .gro or .pdb file
+    tpr : str
+        Filename of output of grompp
+    index : str
+        Filename of index file (Default index.ndx)
+    topol : str
+        Filename of topology file (Default topol.top)
+    maxwarn : int
+        Maximum number of acceptable warnings when grompping
+    np : int
+        Number of processes to run mpirun on (Default 1 for non-mpi run)
+    """
+
+    if mpirun == True:
+        mpi = "mpirun " + "np " + np + "gmx_mpi "
+    elif mpirun == False:
+        mpi = "gmx "
+    else:
+        print ("mpirun only takes bool as input")
+
+    commands = [mpi, "grompp", "-f", mdp, "-p",
+                topol, "-c", coord, "-o", tpr, "-n", index,
+                "-maxwarn", maxwarn]
+
+    subprocess.run(commands, stdout=logfile)
+    return
+
+def mdrun(mpirun, deffnm, plumed, np=1):
+    """
+    Python wrapper for gmx mdrun -deffnm
+
+    Inputs
+    mpirun : Bool
+        Is this a multi-node run or not (gmx vs gmx_mpi), if True must specify
+        number of processes (np)
+    deffnm : str
+         File names for md run
+    plumed : str
+        name of plumed file
+    np : int
+        Number of processes to run mpirun on (Default 1 for non-mpi run)
+    """
+
+    if mpirun == True:
+        mpi = "mpirun " + "np " + np + "gmx_mpi "
+    elif mpirun == False:
+        mpi = "gmx "
+    else:
+        print ("mpirun only takes bool as input")
+
+    commands = [mpi, "mdrun", "-deffnm", deffnm, "-plumed", plumed]
+
+    subprocess.run(commands, stdout=logfile)
+          mpirun -np 1 gmx_mpi mdrun -deffnm em -plumed plumed.dat
+    return
+
+def launch_md(engine="GROMACS"):
+    # recode wrapper script here
+
+    # symbolic link charmm directory
+
+    #
+
+    return

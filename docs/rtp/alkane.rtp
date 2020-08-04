@@ -1,0 +1,44 @@
+;Alkyl terminating groups
+;
+;  ### CONTENTS ###
+; PCT - (middle alkyl)          --> NTM
+; NCH - (NH2 alkyl termination) --> NTT
+
+; PCT (middle)
+;
+;     HP1
+;     |
+; \ --PCP -- \
+;     |
+;     HP2
+
+[ PCT ]
+  [ atoms ]
+           PCP CT2    -0.18 0
+           HP1 HA2     0.09 1
+           HP2 HA2     0.09 2
+
+  [ bonds ]
+           PCP -CLP
+           PCP  HP1
+           PCP  HP2
+           PCP +PCP
+
+; NCH (NH2 alkyl chain termination)
+;
+;        HN1          HN1
+;       /               \
+; \ -- NT      OR        NT --\
+;       \               /
+;        HN2         HN2
+
+[ NCH ]
+  [ atoms ]
+            NT NG2S2  -0.62 0     ;
+           HN1 HGP1    0.31 1     ;
+           HN2 HGP1    0.31 2     ;
+
+  [ bonds ]
+           NT -PCP
+           NT  HN1
+           NT  HN2

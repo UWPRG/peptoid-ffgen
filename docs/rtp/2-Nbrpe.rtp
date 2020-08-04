@@ -1,0 +1,630 @@
+; N-[2-(4-bromophenyethyl) glycine] (2-Nbrpe)
+;
+;  ### CONTENTS ###
+; BTM : middle
+; BTC : CH3 terminated c-term)
+; BTN : CH3 terminated n-term
+; BTV : CH2-CO-NH2 terminated c-term *used to be BNR
+; BTB : NH terminated n-term         *used to be BCR
+; BLM (middle polymer w/ LP atom)
+; BLV (CH2-CO-NH2 terminated c-term w/ LP atom)
+; BLB (NH terminated n-term w/ LP atom)
+;
+; BTM (MIDDLE)
+;
+;           BRL
+;           |
+;           CH
+;          /   \
+;       CZ1     CZ2
+;         |  O  |
+;       CE1     CE2
+;          \   /
+;           CD
+;           |
+;           CG
+;           |
+;    OL     CB
+;    ||     |
+; \--CLP -- NL -- CA --\
+
+[ BTM ]
+ [ atoms ]
+           CLP   TC      0.51 0
+           OL    O      -0.51 1
+           NL    NH1    -0.42 2
+           CA    CT2     0.03 3
+           HA1   HB2     0.09 4
+           HA2   HB2     0.09 5
+           CB    CT2    -0.04 6
+           HB1   HA2     0.09 7
+           HB2   HA2     0.09 8
+           CG    CT2    -0.12 9
+           HG1   HA2     0.09 10
+           HG2   HA2     0.09 11
+           CD    CG2R61  0.00 12
+           CE1   CG2R61 -0.12 13
+           HE1   HGR61   0.12 14
+           CE2   CG2R61 -0.12 15
+           HE2   HGR61   0.12 16
+           CZ1   CG2R61 -0.07 17
+           HZ1   HGR61   0.14 18
+           CZ2   CG2R61 -0.07 19
+           HZ2   HGR61   0.14 20
+           CH    CG2R61 -0.03 21
+           BRL   BRGR1  -0.10 22
+ [ bonds ]
+           CA   -CLP
+           CLP   NL
+           NL    CA
+           CLP   OL
+           NL    CB
+           CB    CG
+           CG    CD
+           CD    CE1
+           CD    CE2
+           CE1   CZ1
+           CZ1   CH
+           CH    BRL
+           CH    CZ2
+           CZ2   CE2
+           CA    HA1
+           CA    HA2
+           CB    HB1
+           CB    HB2
+           CG    HG1
+           CG    HG2
+           CE1   HE1
+           CE2   HE2
+           CZ1   HZ1
+           CZ2   HZ2
+           CLP  +CA
+ [ impropers ]
+           NL    CLP CA  CB
+
+; BTC (CH3 terminated c-term)
+;
+;           BRL
+;           |
+;           CH
+;          /   \
+;       CZ1     CZ2
+;         |  O  |
+;       CE1     CE2
+;          \   /
+;           CD
+;           |
+;           CG
+;           |
+;    OL     CB    HR1
+;    ||     |     |
+; \--CLP -- NL -- CR -HR2
+;                 |
+;                 HR3
+
+[ BTC ]
+ [ atoms ]
+           CLP TC      0.51 0
+           OL  O      -0.51 1
+           NL  NH1    -0.42 2
+           CB  CT2    -0.04 3
+           HB1 HA2     0.09 4
+           HB2 HA2     0.09 5
+           CG  CT2    -0.12 6
+           HG1 HA2     0.09 7
+           HG2 HA2     0.09 8
+           CD  CG2R61  0.00 9
+           CE1 CG2R61 -0.12 10
+           CE2 CG2R61 -0.12 11
+           CZ1 CG2R61 -0.07 12
+           CZ2 CG2R61 -0.07 13
+           CH  CG2R61 -0.03 14
+           HE1 HGR61   0.12 15
+           HE2 HGR61   0.12 16
+           HZ1 HGR61   0.14 17
+           HZ2 HGR61   0.14 18
+           BRL BRGR1  -0.10 19
+           CR  CT3    -0.06 20
+           HR1 HA3     0.09 21
+           HR2 HA3     0.09 22
+           HR3 HA3     0.09 23
+ [ bonds ]
+           CLP   NL
+           NL    CR
+           CLP   OL
+           NL    CB
+           CB    CG
+           CG    CD
+           CD    CE1
+           CD    CE2
+           CE1   CZ1
+           CZ1   CH
+           CH    BRL
+           CH    CZ2
+           CZ2   CE2
+           CR    HR1
+           CR    HR2
+           CR    HR3
+           CB    HB1
+           CB    HB2
+           CG    HG1
+           CG    HG2
+           CE1   HE1
+           CE2   HE2
+           CZ1   HZ1
+           CZ2   HZ2
+           CLP  -CA
+  [ impropers ]
+           CLP  -CA   NL  OL
+           NL    CLP  CR  CB
+
+; BTN (CH3 terminated n-term)
+;
+;                 BRL
+;                 |
+;                 CH
+;                /   \
+;             CZ1     CZ2
+;               |  O  |
+;             CE1     CE2
+;                \   /
+;                 CD
+;                 |
+;                 CG
+;                 |
+;      HL1 OL     CB
+;      |   ||     |
+; HL2--CL--CLP -- NL -- CA --\
+;      |
+;      HL3
+
+[ BTN ]
+ [ atoms ]
+           CL    CT3    -0.27 0
+           HL1   HA3     0.09 1
+           HL2   HA3     0.09 2
+           HL3   HA3     0.09 3
+           CLP   TC      0.51 4
+           OL    O      -0.51 5
+           NL    NH1    -0.42 6
+           CB    CT2    -0.04 7
+           HB1   HA2     0.09 8
+           HB2   HA2     0.09 9
+           CG    CT2    -0.12 10
+           HG1   HA2     0.09 11
+           HG2   HA2     0.09 12
+           CD    CG2R61  0.00 13
+           CE1   CG2R61 -0.12 14
+           CE2   CG2R61 -0.12 15
+           CZ1   CG2R61 -0.07 16
+           CZ2   CG2R61 -0.07 17
+           CH    CG2R61 -0.03 18
+           HE1   HGR61   0.12 19
+           HE2   HGR61   0.12 20
+           HZ1   HGR61   0.14 21
+           HZ2   HGR61   0.14 22
+           BRL   BRGR1  -0.10 23
+           CA    CT2     0.03 24
+           HA1   HB2     0.09 25
+           HA2   HB2     0.09 26
+
+ [ bonds ]
+           CL    CLP
+           CLP   NL
+           NL    CA
+           CLP   OL
+           NL    CB
+           CB    CG
+           CG    CD
+           CD    CE1
+           CD    CE2
+           CE1   CZ1
+           CZ1   CH
+           CH    BRL
+           CH    CZ2
+           CZ2   CE2
+           CA    HA1
+           CA    HA2
+           CL    HL1
+           CL    HL2
+           CL    HL3
+           CB    HB1
+           CB    HB2
+           CG    HG1
+           CG    HG2
+           CE1   HE1
+           CE2   HE2
+           CZ1   HZ1
+           CZ2   HZ2
+           CLP   -CA
+ [ impropers ]
+           CLP   CL  NL  OL
+           NL    CLP CA  CB
+
+; BTV (CH2-CO-NH2 terminated c-term)
+;
+;              BRL
+;              |
+;              CH
+;             /   \
+;          CZ1     CZ2
+;            |  O  |
+;          CE1     CE2
+;             \   /
+;              CD
+;              |
+;              CG
+;              |
+;       OL     CB           OL2    HN1
+;       ||     |            ||     |
+;    \--CLP -- NL -- CA -- CP2 -- NT
+;                                  |
+;                                  HN2
+
+[ BTV ]
+ [ atoms ]
+          CLP  TC      0.51 0
+           OL  O      -0.51 1
+           NL  NH1    -0.42 2
+           CA  CT2     0.03 3
+           HA1 HB2     0.09 4
+           HA2 HB2     0.09 5
+           CB  CT2    -0.04 6
+           HB1 HA2     0.09 7
+           HB2 HA2     0.09 8
+           CG  CT2    -0.12 9
+           HG1 HA2     0.09 10
+           HG2 HA2     0.09 11
+           CD  CG2R61  0.00 12
+           CE1 CG2R61 -0.12 13
+           HE1 HGR61   0.12 14
+           CE2 CG2R61 -0.12 15
+           HE2 HGR61   0.12 16
+           CZ1 CG2R61 -0.07 17
+           HZ1 HGR61   0.14 18
+           CZ2 CG2R61 -0.07 19
+           HZ2 HGR61   0.14 20
+           CH  CG2R61 -0.03 21
+           BRL BRGR1  -0.10 22
+           CP2 TC      0.51 23
+           OL2 O      -0.51 24
+            NT NG2S2  -0.62 25
+           HN1 HGP1    0.31 26
+           HN2 HGP1    0.31 27
+ [ bonds ]
+          CLP   +CA
+          CLP    NR
+          CLP    OL
+           NL    CB
+           NL    CA1
+          CA1    CP2
+          CP2    OL2
+          CP2    NT
+           CB    CG
+           CG    CD
+           CD    CE1
+           CD    CE2
+           CE1   CZ1
+           CZ1   CH
+           CH    BRL
+           CH    CZ2
+           CZ2   CE2
+          CA1    HA1
+          CA1    HA2
+           CB    HB1
+           CB    HB2
+           CG    HG1
+           CG    HG2
+           CE1   HE1
+           CE2   HE2
+           CZ1   HZ1
+           CZ2   HZ2
+           NT    HN1
+           NT    HN2
+ [ impropers ]
+           CLP +CA   NL  OL
+           CP2  CA1  NT  OL2
+
+; BTB (NH terminated n-term)
+;
+;                 BRL
+;                 |
+;                 CH
+;                /   \
+;             CZ1     CZ2
+;               |  O  |
+;             CE1     CE2
+;                \   /
+;                 CD
+;                 |
+;                 CG
+;                 |
+;                 CB
+;                 |
+;           HN1-- NL -- CA --\
+
+[ BTB ]
+ [ atoms ]
+         NL    NH1    -0.47 0 ; adjusted for NH backbone (cgenff)
+         HN1   H       0.31 1 ; comes from NH backbone   (cgenff)
+         CB    CT2    -0.04 2
+         HB1   HA2     0.09 3
+         HB2   HA2     0.09 4
+         CG    CT2    -0.12 5
+         HG1   HA2     0.09 6
+         HG2   HA2     0.09 7
+         CD    CG2R61  0.00 8
+         CE1   CG2R61 -0.12 9
+         CE2   CG2R61 -0.12 10
+         CZ1   CG2R61 -0.07 11
+         CZ2   CG2R61 -0.07 12
+         CH    CG2R61 -0.03 13
+         HE1   HGR61   0.12 14
+         HE2   HGR61   0.12 15
+         HZ1   HGR61   0.14 16
+         HZ2   HGR61   0.14 17
+         BRL   BRGR1  -0.10 18
+         CA    CT2    -0.13 19 ; adjusted for NH backbone (cgenff)
+         HA1   HB2     0.09 20
+         HA2   HB2     0.09 21
+ [ bonds ]
+           CA   -CLP
+           NL    HN1
+           NL    CA
+           NL    CB
+           CB    CG
+           CG    CD
+           CD    CE1
+           CD    CE2
+           CE1   CZ1
+           CZ1   CH
+           CH    BRL
+           CH    CZ2
+           CZ2   CE2
+           CA    HA1
+           CA    HA2
+           CB    HB1
+           CB    HB2
+           CG    HG1
+           CG    HG2
+           CE1   HE1
+           CE2   HE2
+           CZ1   HZ1
+           CZ2   HZ2
+ [ impropers ] ; no improper dihed at n-term
+
+; BLM (MIDDLE w/ LP)
+;           LP
+;           |
+;           BRL
+;           |
+;           CH
+;          /   \
+;       CZ1     CZ2
+;         |  O  |
+;       CE1     CE2
+;          \   /
+;           CD
+;           |
+;           CG
+;           |
+;    OL     CB
+;    ||     |
+; \--CLP -- NL -- CA --\
+
+[ BLM ]
+ [ atoms ]
+           CLP   TC      0.51 0
+           OL    O      -0.51 1
+           NL    NH1    -0.42 2
+           CA    CT2     0.03 3
+           HA1   HB2     0.09 4
+           HA2   HB2     0.09 5
+           CB    CT2    -0.04 6
+           HB1   HA2     0.09 7
+           HB2   HA2     0.09 8
+           CG    CT2    -0.12 9
+           HG1   HA2     0.09 10
+           HG2   HA2     0.09 11
+           CD    CG2R61  0.00 12
+           CE1   CG2R61 -0.12 13
+           HE1   HGR61   0.12 14
+           CE2   CG2R61 -0.12 15
+           HE2   HGR61   0.12 16
+           CZ1   CG2R61 -0.07 17
+           HZ1   HGR61   0.14 18
+           CZ2   CG2R61 -0.07 19
+           HZ2   HGR61   0.14 20
+           CH    CG2R61  0.00 21
+           BRL   BRGR1  -0.18 22
+           LP    LPH     0.05 23
+
+ [ bonds ]
+           CA   -CLP
+           CLP   NL
+           NL    CA
+           CLP   OL
+           NL    CB
+           CB    CG
+           CG    CD
+           CD    CE1
+           CD    CE2
+           CE1   CZ1
+           CZ1   CH
+           CH    BRL
+           BRL   LP
+           CH    CZ2
+           CZ2   CE2
+           CA    HA1
+           CA    HA2
+           CB    HB1
+           CB    HB2
+           CG    HG1
+           CG    HG2
+           CE1   HE1
+           CE2   HE2
+           CZ1   HZ1
+           CZ2   HZ2
+           CLP  +CA
+ [ impropers ]
+           NL    CLP CA  CB
+
+; BLV (CH2-CO-NH2 terminated c-term w/ LP)
+;
+;              LP
+;              |
+;              BRL
+;              |
+;              CH
+;             /   \
+;          CZ1     CZ2
+;            |  O  |
+;          CE1     CE2
+;             \   /
+;              CD
+;              |
+;              CG
+;              |
+;       OL     CB           OL2    HN1
+;       ||     |            ||     |
+;    \--CLP -- NL -- CA -- CP2 -- NT
+;                                  |
+;                                  HN2
+
+[ BTV ]
+ [ atoms ]
+          CLP  TC      0.51 0
+           OL  O      -0.51 1
+           NL  NH1    -0.42 2
+           CA  CT2     0.03 3
+           HA1 HB2     0.09 4
+           HA2 HB2     0.09 5
+           CB  CT2    -0.04 6
+           HB1 HA2     0.09 7
+           HB2 HA2     0.09 8
+           CG  CT2    -0.12 9
+           HG1 HA2     0.09 10
+           HG2 HA2     0.09 11
+           CD  CG2R61  0.00 12
+           CE1 CG2R61 -0.12 13
+           HE1 HGR61   0.12 14
+           CE2 CG2R61 -0.12 15
+           HE2 HGR61   0.12 16
+           CZ1 CG2R61 -0.07 17
+           HZ1 HGR61   0.14 18
+           CZ2 CG2R61 -0.07 19
+           HZ2 HGR61   0.14 20
+           CH  CG2R61  0.00 21
+           BRL BRGR1  -0.18 22
+           CP2 TC      0.51 23
+           OL2 O      -0.51 24
+            NT NG2S2  -0.62 25
+           HN1 HGP1    0.31 26
+           HN2 HGP1    0.31 27
+           LP  LPH     0.05 28
+ [ bonds ]
+          CLP   +CA
+          CLP    NR
+          CLP    OL
+           NL    CB
+           NL    CA1
+          CA1    CP2
+          CP2    OL2
+          CP2    NT
+           CB    CG
+           CG    CD
+           CD    CE1
+           CD    CE2
+           CE1   CZ1
+           CZ1   CH
+           CH    BRL
+           BRL   LP
+           CH    CZ2
+           CZ2   CE2
+          CA1    HA1
+          CA1    HA2
+           CB    HB1
+           CB    HB2
+           CG    HG1
+           CG    HG2
+           CE1   HE1
+           CE2   HE2
+           CZ1   HZ1
+           CZ2   HZ2
+           NT    HN1
+           NT    HN2
+ [ impropers ]
+           CLP +CA   NL  OL
+           CP2  CA1  NT  OL2
+
+; BLB (NH terminated n-term)
+;
+;                 LP
+;                 |
+;                 BRL
+;                 |
+;                 CH
+;                /   \
+;             CZ1     CZ2
+;               |  O  |
+;             CE1     CE2
+;                \   /
+;                 CD
+;                 |
+;                 CG
+;                 |
+;                 CB
+;                 |
+;           HN1-- NL -- CA --\
+
+[ BTB ]
+ [ atoms ]
+         NL    NH1    -0.47 0 ; adjusted for NH backbone (cgenff)
+         HN1   H       0.31 1 ; comes from NH backbone   (cgenff)
+         CB    CT2    -0.04 2
+         HB1   HA2     0.09 3
+         HB2   HA2     0.09 4
+         CG    CT2    -0.12 5
+         HG1   HA2     0.09 6
+         HG2   HA2     0.09 7
+         CD    CG2R61  0.00 8
+         CE1   CG2R61 -0.12 9
+         CE2   CG2R61 -0.12 10
+         CZ1   CG2R61 -0.07 11
+         CZ2   CG2R61 -0.07 12
+         CH    CG2R61  0.00 13
+         HE1   HGR61   0.12 14
+         HE2   HGR61   0.12 15
+         HZ1   HGR61   0.14 16
+         HZ2   HGR61   0.14 17
+         BRL   BRGR1  -0.18 18
+         CA    CT2    -0.13 19 ; adjusted for NH backbone (cgenff)
+         HA1   HB2     0.09 20
+         HA2   HB2     0.09 21
+         LP    LPH     0.05 22
+ [ bonds ]
+           CA   -CLP
+           NL    HN1
+           NL    CA
+           NL    CB
+           CB    CG
+           CG    CD
+           CD    CE1
+           CD    CE2
+           CE1   CZ1
+           CZ1   CH
+           CH    BRL
+           BRL   LP
+           CH    CZ2
+           CZ2   CE2
+           CA    HA1
+           CA    HA2
+           CB    HB1
+           CB    HB2
+           CG    HG1
+           CG    HG2
+           CE1   HE1
+           CE2   HE2
+           CZ1   HZ1
+           CZ2   HZ2
+ [ impropers ] ; no improper dihed at n-term
