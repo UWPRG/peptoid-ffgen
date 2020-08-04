@@ -8,9 +8,9 @@ import numpy as np
 # coterminal/coterminal_rev are used to deal with weird gaussian outputs
 def coterminal(cv_deg):
     """
-    Inputs
     Takes an input CV range from -180 to 180 and converts to 0 to 360
 
+    Inputs
     cv_deg : array
         Array of degree values to change
         * Warning will only deal with range from -180 to 180
