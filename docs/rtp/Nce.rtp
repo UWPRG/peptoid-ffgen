@@ -1,0 +1,224 @@
+; N-[2-carboxyethyl glycine] 2-Nce
+;
+; ### CONTENTS ###
+; CTM - (middle polymer)        --> CTM
+; CTN - (CH3 terminated n-term) --> CTN
+; CTC - (CH3 terminated c-term) --> CTC
+; CCR - (NH terminated n-term)  --> CTB
+;
+; ### NEED TO ADD ###
+; CHM - (neutral middle)
+; CHB - (neutral NH terminated n-term)
+;
+; ### NOT YET BUILT ### (no direct need to build, but would complete FF)
+; # CTV - (CH2-CO-NH2 terminated c-term)
+;
+
+; CTM (MIDDLE)
+;
+;       OD1     OD2 (charge: -1)
+;          \   /
+;           CD
+;           |
+;           CG
+;           |
+;    OL     CB
+;    ||     |
+; \--CLP -- NL -- CA --\
+
+[ CTM ]
+ [ atoms ]
+           CLP   TC      0.51 1
+           OL    O      -0.51 2
+           NL    NH1    -0.42 3
+           CA    CT2     0.03 4
+           HA1   HB2     0.09 5
+           HA2   HB2     0.09 6
+           CB    CT2    -0.01 7
+           HB1   HA2     0.09 8
+           HB2   HA2     0.09 9
+           CG    CT2    -0.24 10
+           HG1   HA2     0.09 11
+           HG2   HA2     0.09 12
+           CD    CC      0.62 13
+           OD1   OC     -0.76 14
+           OD2   OC     -0.76 15
+           HA2   HB2     0.09 16
+
+[ bonds ]
+           CLP   +CA
+           CLP   NL
+           NL    CA
+           CLP   OL
+           NL    CB
+           CB    CG
+           CG    CD
+           CA    HA1
+           CA    HA2
+           CB    HB1
+           CB    HB2
+           CG    HG1
+           CG    HG2
+           CD    OD1
+           CD    OD2
+           CA    -CLP
+ [ impropers ]
+           NL    CLP CA  CB
+
+; CTN (CH3 terminated n-term)
+;
+;               OD1     OD2 (charge: -1)
+;                 \    /
+;                   CD
+;                   |
+;                   CG
+;                   |
+;        HL1 OL     CB
+;        |   ||     |
+; HL2 -- CL--CLP -- NL -- CA --\
+;        |
+;        HL3
+[ CTN ]
+ [ atoms ]
+           CL    CT3    -0.27 0
+           HL1   HA3     0.09 1
+           HL2   HA3     0.09 2
+           HL3   HA3     0.09 3
+           CLP   TC      0.51 4
+           OL    O      -0.51 5
+           NL    NH1    -0.42 6
+           CB    CT2    -0.01 7
+           HB1   HA2     0.09 8
+           HB2   HA2     0.09 9
+           CG    CT2    -0.24 10
+           HG1   HA2     0.09 11
+           HG2   HA2     0.09 12
+           CD    CC      0.62 13
+           OD1   OC     -0.76 14
+           OD2   OC     -0.76 15
+           CA    CT2     0.03 24
+           HA1   HB2     0.09 25
+           HA2   HB2     0.09 26
+
+[ bonds ]
+           CL    CLP
+           CLP   NL
+           NL    CA
+           CLP   OL
+           NL    CB
+           CB    CG
+           CG    CD
+           CA    HA1
+           CA    HA2
+           CL    HL1
+           CL    HL2
+           CL    HL3
+           CB    HB1
+           CB    HB2
+           CG    HG1
+           CG    HG2
+           CD    OD1
+           CD    OD2
+           CA    +CLP
+ [ impropers ]
+           CLP   CL  NL  OL
+           NL    CLP CA  CB
+
+; CTC (CH3 terminated c-term)
+;
+;       OD1     OD2 (charge: -1)
+;          \   /
+;           CD
+;           |
+;           CG
+;           |
+;    OL     CB    HR1
+;    ||     |     |
+; \--CLP -- NL -- CR --HR2
+;                 |
+;                 HR3
+
+[ CTC ]
+ [ atoms ]
+           CLP   TC      0.51 4
+           OL    O      -0.51 5
+           NL    NH1    -0.42 6
+           CB    CT2    -0.01 7
+           HB1   HA2     0.09 8
+           HB2   HA2     0.09 9
+           CG    CT2    -0.24 10
+           HG1   HA2     0.09 11
+           HG2   HA2     0.09 12
+           CD    CC      0.62 13
+           OD1   OC     -0.76 14
+           OD2   OC     -0.76 15
+           CR    CT3    -0.06 24
+           HR1   HA3     0.09 25
+           HR2   HA3     0.09 26
+           HR3   HA3     0.09 26
+
+[ bonds ]
+           CLP  -CA
+           CLP   NL
+           CLP   OL
+           NL    CR
+           NL    CB
+           CB    CG
+           CR    HR1
+           CR    HR2
+           CR    HR3
+           CB    HB1
+           CB    HB2
+           CG    HG1
+           CG    HG2
+           CG    CD
+           CD    OD1
+           CD    OD2
+ [ impropers ]
+           CLP  -CA   NL  OL
+           NL    CLP  CR  CB
+
+; CCR (NH terminated n-term)
+;             OD1     OD2 (charge: -1)
+;                \   /
+;                 CD
+;                 |
+;                 CG
+;                 |
+;                 CB
+;                 |
+;           HN1-- NL -- CA --\
+
+[ CCR ]
+ [ atoms ]
+           NL    NH1    -0.62 1
+           HN1     H     0.20 2
+           CA    CT2     0.03 3
+           HA1   HB2     0.09 4
+           HA2   HB2     0.09 5
+           CB    CT2    -0.01 6
+           HB1   HA2     0.09 7
+           HB2   HA2     0.09 8
+           CG    CT2    -0.24 9
+           HG1   HA2     0.09 10
+           HG2   HA2     0.09 11
+           CD    CC      0.62 12
+           OD1   OC     -0.76 13
+           OD2   OC     -0.76 14
+
+  [ bonds ]
+           NL    HN1
+           NL    CA
+           NL    CB
+           CB    CG
+           CG    CD
+           CA    HA1
+           CA    HA2
+           CB    HB1
+           CB    HB2
+           CG    HG1
+           CG    HG2
+           CD    OD1
+           CD    OD2
+           CA    -CLP
+[ impropers ] ; no improper dihed at n-term

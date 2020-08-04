@@ -1,0 +1,23 @@
+; N-[1-phenylethyl glycine] (Ns1pe)
+;
+; ## CONTENTS ###
+; NSM - (middle polymer)
+
+; NSM (MIDDLE)
+;
+;
+; BMO (MIDDLE)
+;
+;           BRL
+;           |
+;           CH
+;          /   \
+;       CE1     CE2
+;         |  O  |
+;       CD1     CD2
+;          \   /
+;           CG
+;           |
+;    OL     CB -- CB1
+;    ||     |
+; \--CLP -- NL -- CA --\

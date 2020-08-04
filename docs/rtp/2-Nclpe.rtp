@@ -1,0 +1,27 @@
+; N-[2-(4-chlorophenyethyl) glycine] (2-Nclpe)
+
+;  ### CONTENTS ###
+; LTM - (middle polymer)
+; LTC - (CH3 terminated c-term) **BACKWARDS**
+; LTN - (CH3 terminated n-term) **BACKWARDS**
+;
+; ### NEED TO ADD ###
+; *ALSO NEEDS LP atoms in the future - not in this version*
+;
+; LTM (MIDDLE)
+;
+;           CLL
+;           |
+;           CH
+;          /   \
+;       CZ1     CZ2
+;         |  O  |
+;       CE1     CE2
+;          \   /
+;           CD
+;           |
+;           CG
+;           |
+;    OL     CB
+;    ||     |
+; \--CLP -- NL -- CA --\
