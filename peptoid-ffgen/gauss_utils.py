@@ -15,6 +15,7 @@ def fortrandouble(x):
     """
     return float(x.replace('D', 'E'))
 
+
 def check_post_hartree_fock(post_hartree_fock):
     """Check if post-HF method is being used and which one.
 
@@ -26,6 +27,7 @@ def check_post_hartree_fock(post_hartree_fock):
     Returns
     -------
     using_post_HF : bool
+        Boolean that denotes whether PHF method is used
     """
     post_HF_options = {'MP2': 'EUMP2', 'MP3': 'EUMP3'}
     if post_hartree_fock:
@@ -40,19 +42,21 @@ def read_log_into_lists(logfile, post_hartree_fock):
     """Read the log file into lists.
 
     Paramters
+    ---------
     post_hartree_fock : str
 	String of post-HF level
     logfile : str
 	String with  full name of log file including extension
 
-    ---------
+    
 
     Returns
-     cartcoords : array
+    -------
+    cartcoords : array
         array with modifictions (1st and 3rd columns deleted from coordinates).
-        step_num : list of lists
-        energy : list of lists
-    ------
+    step_num : list of lists
+    energy : list of lists
+    
 
     """
     post_HF_options = {'MP2': 'EUMP2', 'MP3': 'EUMP3'}
@@ -100,20 +104,23 @@ def read_log_into_lists(logfile, post_hartree_fock):
     cartcoords = np.delete(cartcoords, [0, 2] ,axis=2)
     return cartcoords, step_num
 
+
 def determine_and_save_frames(scan, full, step_num):
     """Determine which frames to write to file.Save all frames, even if it is a scan calculation.
     Parameters
+    ----------
     scan : bool
 	boolean on scan calculation (Default = True)
     full : bool
 	boolean on saving all frames (Defuault = True)
     step_num : list of lists
 	 
-    ----------
+    
     
     Returns
-    save_frames : list
     -------
+    save_frames : list
+    
 
     """
     #Determine which frames to write to file.
@@ -146,9 +153,11 @@ def determine_and_save_frames(scan, full, step_num):
         save_frames = range(len(step_num))
     return save_frames
 
+
 def write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartcoords, step_num, energy):
     """Write to file
     Paramters
+    ---------
     outfile : str
 	str that contains name of file without extension 
     overwrite : bool
@@ -161,10 +170,7 @@ def write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartco
     cartcoords : array
     step_num : list of lists
     energy : array
-    ---------
-
-    Returns
-    -------
+    
      
     """
     element_dict = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N',
@@ -218,8 +224,9 @@ def write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartco
     print('Output written to {}'.format(outputfile))
     return
 
+
 def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_num, energy):
-    """Write to file
+    """Write to multiple files
     Paramters
     ---------
     outfile : str
@@ -227,25 +234,18 @@ def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_nu
     no_energy : bool
         Enabling turns off recording of energy (Default = False)
     save_frames : list
+     list of frame indices
     cartcoords : array
+        xyz coordinates 
     step_num : list of lists
+       list of lists containing current and max iterations
     energy : array
+        energy of each frame
 
 
     """
     element_dict = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N',
                     8: 'O', 9: 'F', 10: 'Ne', 11: 'Na', 16: 'S'}
-    """
-    if outfile:
-        if outfile.endswith('.xyz'):
-            pass
-        else:
-            outfile = outfile + '.xyz'
-        outputfile = outfile
-    else:
-        outputfile = os.path.splitext(logfile)[0] + '.xyz'
-
-    """
 
 
     for i, f in enumerate(save_frames):
@@ -265,9 +265,29 @@ def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_nu
     
     return
 
-#Wrapper functiom
-def parse_logfile(scan, logfile, overwrite, full, no_energy, last_frame, post_hartree_fock, outfile):
 
+def parse_logfile(scan, logfile, overwrite, full, no_energy, last_frame, post_hartree_fock, outfile):
+     """Parsing the logfile, wrapper function.
+    Parameters
+    ----------
+    scan : bool
+        boolean on scan calculation (Default = True)
+    logfile : string
+        String with  full name of log file including extension
+    overwrite : bool
+        denotes whether or not output file overwrites previous file of same name (Default = True)
+    full : bool
+        denotes saving all frames (Defuault = True)
+    no_energy : bool
+        Enabling turns off recording of energy (Default = False)
+    last_frame: bool
+        denotes whether to save only the last frame (Default = False)
+    post_hartree_fock : str
+        String of post-HF level
+    outfile : str
+        str that contains name of file without extension
+    
+    """
     check_post_hartree_fock(post_hartree_fock)
 
     cartcoords, step_num, energy = read_log_into_lists(logfile, post_hartree_fock)
