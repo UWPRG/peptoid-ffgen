@@ -218,6 +218,53 @@ def write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartco
     print('Output written to {}'.format(outputfile))
     return
 
+def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_num, energy):
+    """Write to file
+    Paramters
+    ---------
+    outfile : str
+	str that contains name of file without extension
+    no_energy : bool
+        Enabling turns off recording of energy (Default = False)
+    save_frames : list
+    cartcoords : array
+    step_num : list of lists
+    energy : array
+
+
+    """
+    element_dict = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N',
+                    8: 'O', 9: 'F', 10: 'Ne', 11: 'Na', 16: 'S'}
+    """
+    if outfile:
+        if outfile.endswith('.xyz'):
+            pass
+        else:
+            outfile = outfile + '.xyz'
+        outputfile = outfile
+    else:
+        outputfile = os.path.splitext(logfile)[0] + '.xyz'
+
+    """
+
+
+    for i, f in enumerate(save_frames):
+        #Append a number to outfile to note which frame
+        single_frame_file = outfile + str(i) + '.xyz'
+        with open(single_frame_file, 'w') as outf:
+            outf.write('{}\n'.format(len(cartcoords[f])))
+            if no_energy:
+                outf.write('i = {0:3d}\n'.format(step_num[f][-2]))
+            else:
+                outf.write('i = {0:3d}, E = {1: >17.12f}\n'
+                           .format(step_num[f][-2], energy[f]))
+            for line in cartcoords[f]:
+                element = element_dict[int(line[0])]
+                outf.write(' {0:s}\t\t\t{1: 2.5f}  {2: 2.5f}  {3: 2.5f}\n'\
+                           .format(element, *line[1:]))                
+    
+    return
+
 #Wrapper functiom
 def parse_logfile(scan, logfile, overwrite, full, no_energy, last_frame, post_hartree_fock, outfile):
 
@@ -227,4 +274,7 @@ def parse_logfile(scan, logfile, overwrite, full, no_energy, last_frame, post_ha
 
     save_frames = determine_and_save_frames(scan, full, step_num)
 
-    write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartcoords, step_num, energy)
+    if multiple_files:
+        write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_num, energy)
+    else: 
+        write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartcoords, step_num, energy)
