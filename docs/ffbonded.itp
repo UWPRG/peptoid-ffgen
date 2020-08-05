@@ -1,0 +1,140 @@
+; add to charmm FF (we used charmm36-nov2016.ff)
+
+[ bondtypes ]
+; ### RELEVANT EQUATIONS ###
+; bond func1 = 1/2*kb*(b-b0)**2
+;
+; b0 (gromacs) = b0(charmm) * (1nm/10A)**2
+; kb (gromacs) = kb(charmm) * 2 * (10A/1nm)**2 * (4.184kJ/mol / 1kcal/mol) FOR BONDFUNC1 ONLY
+;
+; Peptoid bonds from Mirijanian et al. (Janani Sampath) checked by Sarah Alamdari
+; From Mirijanian HA3(gromacs) = HA(charmm) --> (CH3 Hydrogen)
+; From Mirijanian HB2(gromacs) = HB(charmm) --> (CH2 backbone hydrogen)
+; ## NEW PARAMS ###
+; i       j         func  b0(A)       kb(kJ mol-1 nm-2)
+     CT2      TC      1   0.14900000    209200.00
+     CT3      TC      1   0.14900000    209200.00
+     NH1      TC      1   0.13450000    309616.00
+       O      TC      1   0.12300000    518816.00
+; additional bonds needed for NH2 termini (Sarah Alamdari)
+     TC       NG2S2   1   0.1345   309616.000
+     CT2      NG2S2   1   0.1345   309616.000
+     NG2S2    HGP1    1   0.1000   401664.000
+
+[ angletypes ]
+; ### RELEVANT EQUATIONS ###
+; angle func5 Urey Bradley Potential = [1/2 ktheta * (theta - theta0)**2] + [1/2 kub * (r-r0)**2]
+;
+; theta0(gro) = theta0(charmm)
+; ktheta(gro) = ktheta(charmm) * 2 * 4.184kJ/kcal
+; r0(gro)     = s0(charmm) * (1nm/10A)
+; kub(gro)    = kub(charmm) * 2 * (10A/1nm)**2 * 4.184kJ/kcal
+; ## NEW PARAMS ###
+;
+; i     j     k  func    theta0(deg)   ktheta(kJ/mol/rad^2)       r0(nm)     kub(kJ/mol/nm^2)
+; Peptoid angles from Mirijanian et al. (Janani Sampath) + checked by SA
+    CT2       NH1      TC      5   120.0000     418.400  0.0      0.0
+    CT3       NH1      TC      5   120.0000     418.400  0.0      0.0
+    CT3       NH1      CT3     5   120.0000     418.400  0.0      0.0
+    CT3       NH1      CT2     5   120.0000     418.400  0.0      0.0
+    HA3       CT3      TC      5   109.5000     276.144  0.216300 25104.00
+    HB2       CT2      TC      5   109.5000     418.400  0.0      0.0
+    NH1       TC       CT2     5   116.5000     669.440  0.0      0.0
+    NH1       TC       CT3     5   116.5000     669.440  0.0      0.0
+    NH1       CT2      TC      5   107.0000     418.400  0.0      0.0
+    O         TC       CT2     5   121.0000     669.440  0.0      0.0
+    O         TC       CT3     5   121.0000     669.440  0.0      0.0
+    O         TC       NH1     5   122.5000     669.440  0.0      0.0
+    HC        NH1      HC      5   106.5000     326.352  0.0      0.0
+    CT2       NH1      CT2     5   120.0000     418.400  0.0      0.0
+    HC        NH1      CT2     5   109.5000     251.040  0.207400 16736.00
+    CT2       CT2      CA      5   107.5000     433.4624 0.0      0.0
+; additional angles needed for NH2 termini (Sarah Alamdari)
+   NG2S2     TC        O         5   122.500      627.600      0.23700      41840.000
+   TC        NG2S2     HGP1      5   120.000      418.400      0.00000      0.000
+   HGP1      NG2S2     HGP1      5   120.000      192.464      0.00000      0.000
+   CT2       TC        NG2S2     5   116.500      418.400      0.24500      41840.000
+   NG2S2     CT2       CT2       5   110.000000   566.513600   0.00000000   0.00 ; adapted from gen charmm
+   NG2S2     CT2       HA2       5   107.500000   376.560000   0.21010000   29288.00 ; adapted from gen charmm
+   HGP1      NG2S2     CT2       5   111.000000   418.400000   0.00000000   0.00 ; adapted from gen charmm
+   HA2       CT2       TC        5   109.5000     418.400      0.0          0.0
+   CT2       CT2       TC        5   108.000000   435.136000   0.00000000   0.00
+
+[ dihedraltypes ]
+; ### RELEVANT EQUATIONS ###
+;dihedralfunc9 = kphi(1+cos(mult*phi-phi0)
+;
+; phi0(gromacs) = phi0(charmm)
+; kphi(gromacs) = kphi(charmm) * 4.184 kj/kcal
+; ### NEW PARAMS ###
+;   i       j       k       l       func    phi0 [deg]    kphi [kJ/mol]          mult
+; PEPTOID MFTOID DIHEDRALS from Mirijanian et al. (Janani Sampath) - unless noted
+;     TC      CT2     NH1     CT3     9         0.00      7.5312  1 ; updated in santiso/weiser MFTOID rho dihedral
+     TC      CT2     NH1     TC      9         180.0     0.8368  1
+     CT1     TC      NH1     CT1     9         0.00      0.0000  1
+     CT1     TC      NH1     CT1     9         180.0     7.5312  2
+;
+;     CT2     TC      NH1     CT3     9         0.00      0.0000  1 ; updated in santiso/weiser MFTOID omega dihedral
+;     CT2     TC      NH1     CT3     9         180.0     7.5312  2 ; updated in santiso/weiser MFTOID omega dihedral
+;     O       TC      NH1     CT3     9         180.0     10.460  2 ; updated in santiso/weiser MFTOID omega dihedral
+;     O       TC      NH1     CT2     9         180.0     10.460  2 ; updated in santiso/weiser MFTOID omega dihedral
+;
+     CT3     TC      NH1     CT2     9         0.00      0.0000  1
+     CT3     TC      NH1     CT2     9         180.0     7.5312  2
+     CT3     TC      NH1     CT3     9         0.000     0.0000  1
+     CT3     TC      NH1     CT3     9         180.0     7.5312  2
+;
+     HA3     CT3     NH1     TC      9         0.000     0.0000  3
+     HA3     CT3     NH1     CT2     9         0.000     0.0000  3
+     HA3     CT3     NH1     CT3     9         0.000     0.0000  3
+;
+     HB2     CT2     NH1     TC      9         0.000     0.0000  1
+     HB2     CT2     NH1     CT3     9         0.000     0.0000  1
+;
+     NH1     TC      CT2     HB2     9         0.000     0.0000  1
+;     NH1     TC      CT2     NH1     9         0.000     2.5104  1 ; updated in santiso/weiser MFTOID psi dihedral
+     NH1     TC      CT3     HA3     9         0.000     0.0000  3
+;
+     O       TC      CT2     HB2     9         0.000     0.0000  1
+     O       TC      CT2     NH1     9         0.000     0.0000  1
+     O       TC      CT3     HA3     9         180.0     0.0000  3
+;
+     X       CT2     NH1     X       9         0.000     0.4184  3
+;
+; NEW FITTED MFTOID DIHEDRALS from Weiser/Santiso - SA
+; OMEGA
+     CT2     TC      NH1     CT2     9         180.0     8.9956  2
+     CT2     TC      NH1     CT3     9         180.0     8.9956  2
+     O       TC      NH1     CT2     9         180.0     8.9956  2
+     O       TC      NH1     CT3     9         180.0     8.9956  2
+; PSI
+     NH1     TC      CT2     NH1     9         180.0     3.3472  2
+; RHO
+     TC      CT2     NH1     CT3     9         180.0     3.3472  2
+     TC      CT2     NH1     CT2     9         180.0     3.3472  2
+;
+; CHI for unique peptoid chemistries ***NEED TO ADD AND CITE SANTISO***
+;
+; additional CGENFF dihedrals needed for NH2 termini (Sarah Alamdari)
+     O         TC        NG2S2     HGP1      9     180.00    5.858      2
+     CT2       TC        NG2S2     HGP1      9     180.00    5.858      2
+     NG2S2     TC        CT2       NH1       9     0.00      2.510      1
+     NG2S2     TC        CT2       HB2       9     180.00    0.000      3
+     CT2       TC        NG2S2     HGP1      9     180.00    5.858      2
+     HGP1      NG2S2     CT2       CT2       9     0.000000  0.460240   3 ; adapted from gen charmm
+     HGP1      NG2S2     CT2       HA2       9     0.000000  0.460240   3 ; adapted from gen charmm
+     O         TC        CT2       HA2       9     0.000     0.0000     1
+     O         TC        CT2       CT2       9     0.000000  5.857600   1
+     NH1       TC        CT2       HA2       9     0.000     0.0000     1
+     NH1       TC        CT2       CT2       9     0.000000  0.000000   1
+
+[ dihedraltypes ]
+; ### RELEVANT EQUATIONS ###
+; improper func2 = 1/2 * kphi * (phi - phi0)**2
+; keta(gromacs) = keta(charmm) *2 *4.184kJ/kcal
+; keta0(gromacs) = eta0(charmm)
+; ### NEW PARAMS ###
+; General Peptoid Improper dihedral
+;      i        j        k        l  func         eta0 [deg]         keta [kJ/mol/rad^2]
+     O       X       X       TC         2     0.000000    1004.16
+     NH1     X       X       CT3        2     0.000000    167.36
