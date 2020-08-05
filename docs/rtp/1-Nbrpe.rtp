@@ -47,7 +47,6 @@
            CH    CG2R61 -0.03 21
            BRL   BRGR1  -0.10 22
  [ bonds ]
-           CA   -CLP
            CLP   NL
            NL    CA
            CLP   OL
@@ -68,9 +67,10 @@
            CD2   HD2
            CE1   HE1
            CE2   HE2
-           CLP  +CA
+           CA   +CLP
  [ impropers ]
            NL   CLP   CA    CB
+           CLP -CA    NL    OL
 
 ; OTV (CH2-CO-NH2 terminated c-term)
 ;
@@ -118,7 +118,6 @@
            HN1   HGP1    0.31 26
            HN2   HGP1    0.31 27
  [ bonds ]
-           CLP  +CA
            CLP   NL
            NL    CA
            CLP   OL
@@ -141,8 +140,9 @@
            CE2   HE2
 
  [ impropers ]
-           CLP +CA   NL  OL
+           CLP -CA   NL  OL
            CP2  CA1  NT  OL2
+           NL   CLP  CA  CB
 
 ; OTB (NH terminated n-term)
 ;
@@ -183,7 +183,6 @@
            CH    CG2R61 -0.03 21
            BRL   BRGR1  -0.10 22
  [ bonds ]
-           CA   -CLP
            NL    CA
            NL    CB
            NL    HN1
@@ -203,6 +202,7 @@
            CD2   HD2
            CE1   HE1
            CE2   HE2
+           CA   +CLP
 
  [ impropers ] ; no improper dihed at n-term
 
@@ -244,11 +244,10 @@
            HE1   HGR61   0.14 18
            CE2   CG2R61 -0.07 19
            HE2   HGR61   0.14 20
-           CH    CG2R61  0.00 21
-           BRL   BRGR1  -0.18 22
+           CH    CG2R61 -0.02 21
+           BRL   BRGR1  -0.16 22
            LP    LPH     0.05 23
  [ bonds ]
-           CA   -CLP
            CLP   NL
            NL    CA
            CLP   OL
@@ -270,9 +269,10 @@
            CD2   HD2
            CE1   HE1
            CE2   HE2
-           CLP  +CA
+           CA   +CLP
  [ impropers ]
            NL   CLP   CA    CB
+           CLP  -CA   NL  OL
 
 ; OLV (CH2-CO-NH2 terminated c-term)
 ;
@@ -314,8 +314,8 @@
            HE1   HGR61   0.14 18
            CE2   CG2R61 -0.07 19
            HE2   HGR61   0.14 20
-           CH    CG2R61  0.00 21
-           BRL   BRGR1  -0.18 22
+           CH    CG2R61 -0.02 21
+           BRL   BRGR1  -0.16 22
            CP2   TC      0.51 23
            OL2   O      -0.51 24
             NT   NG2S2  -0.62 25
@@ -323,7 +323,6 @@
            HN2   HGP1    0.31 27
             LP   LPH     0.05 28
  [ bonds ]
-           CLP  +CA
            CLP   NL
            NL    CA
            CLP   OL
@@ -347,8 +346,9 @@
            CE2   HE2
 
  [ impropers ]
-           CLP +CA   NL  OL
-           CP2  CA1  NT  OL2
+           CLP -CA   NL  OL
+           CP2  CA   NT  OL2
+           NL   CLP  CA  CB
 
 ; OLB (NH terminated n-term)
 ;
@@ -388,11 +388,10 @@
            HE1   HGR61   0.14 18
            CE2   CG2R61 -0.07 19
            HE2   HGR61   0.14 20
-           CH    CG2R61  0.00 21
-           BRL   BRGR1  -0.18 22
+           CH    CG2R61 -0.02 21
+           BRL   BRGR1  -0.16 22
            LP    LPH     0.05 23
  [ bonds ]
-           CA   -CLP
            NL    CA
            NL    CB
            NL    HN1
@@ -413,5 +412,6 @@
            CD2   HD2
            CE1   HE1
            CE2   HE2
+           CA   +CLP
 
  [ impropers ] ; no improper dihed at n-term

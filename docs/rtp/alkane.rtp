@@ -1,10 +1,11 @@
 ;Alkyl terminating groups
 ;
 ;  ### CONTENTS ###
-; PCT - (middle alkyl)          --> NTM
-; NCH - (NH2 alkyl termination) --> NTT
+; NTM : middle alkyl                     *used to be PCH
+; NTI : intermediate b/w peptoid CLP and tail *used to be PCT
+; NTT : NH2 alkyl termination            *used to be NCH
 
-; PCT (middle)
+; NTM (middle)
 ;
 ;     HP1
 ;     |
@@ -12,7 +13,25 @@
 ;     |
 ;     HP2
 
-[ PCT ]
+[ NTM ]
+  [ atoms ]
+           PCP CT2    -0.18 0
+           HP1 HA2     0.09 1
+           HP2 HA2     0.09 2
+
+  [ bonds ]
+           PCP  HP1
+           PCP  HP2
+           PCP +PCP
+
+; NTI (middle)
+;
+;             HP1
+;             |
+; -CLP -- \ --PCP -- \ -- +PCP
+;             |
+;             HP2
+[ NTI ]
   [ atoms ]
            PCP CT2    -0.18 0
            HP1 HA2     0.09 1
@@ -24,7 +43,7 @@
            PCP  HP2
            PCP +PCP
 
-; NCH (NH2 alkyl chain termination)
+; NTT (NH2 alkyl chain termination)
 ;
 ;        HN1          HN1
 ;       /               \
@@ -32,7 +51,7 @@
 ;       \               /
 ;        HN2         HN2
 
-[ NCH ]
+[ NTT ]
   [ atoms ]
             NT NG2S2  -0.62 0     ;
            HN1 HGP1    0.31 1     ;

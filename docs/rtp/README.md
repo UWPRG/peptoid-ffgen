@@ -31,4 +31,11 @@ other?
 - N : n-term methyl
 - V : c-term amide
 - B : n-term amide
-- T : interchangeable c/n-term (alkyl tails only)
+- I : intermediate (b/w middle and N-term) - alkyl tail only
+- T : interchangeable c/n-term - alkyl tail only
+
+
+**  TO DO LIST ***
+-> go through all impropers? (why sometimes two why sometimes only 1)
+-> check numbering on atoms
+->
