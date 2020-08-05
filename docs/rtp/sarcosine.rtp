@@ -1,42 +1,120 @@
-;  ### CONTENTS ### 
+;  ### CONTENTS ###
 ; STM - (middle polymer)
-; STN - (CH3 terminated n-term) **BACKWARDS**
-; STC - (CH3 terminated c-term) **BACKWARDS**
+; STC - (CH3 terminated c-term)
+; STN - (CH3 terminated n-term)
 
 ; STM (MIDDLE)
 ;
-;           HB1
-;           |
-;    HB2 -- CBP -- HB3
-;           |
+;    OL    CB
+;    ||    |
 ; \--CLP -- NL -- CA --\
-;    ||
-;    OL
+;
 
 [ STM ]
  [ atoms ]
            CLP   TC    0.51 0
            OL    O    -0.51 1
            NL    NH1  -0.42 2
-           CBP   CT3  -0.06 3
+           CB    CT3  -0.06 3
            HB1   HA3   0.09 4
            HB2   HA3   0.09 5
            HB3   HA3   0.09 6
-           CAP   CT2   0.03 7
+           CA    CT2   0.03 7
            HA1   HB2   0.09 8 ; this was HB1 before
            HA2   HB2   0.09 9 ; this was HB1 before
  [ bonds ]
-     CLP   -CAP
            CLP   OL
            CLP   NL
-           NL    CAP
-           NL    CBP
-           CAP    HA1
-           CAP    HA2
-           CBP    HB1
-           CBP    HB2
-           CBP    HB3
-           CAP    +CLP
+           NL    CA
+           NL    CB
+           CA    HA1
+           CA    HA2
+           CB    HB1
+           CB    HB2
+           CB    HB3
+           CA    +CLP
  [ impropers ]
-           CLP  -CAP   NL  OL
-           NL    CLP  CAP  CBP
+           CLP  -CA   NL   OL
+           NL    CA   CLP  CB
+
+; STC (CH3 terminated c-term)
+;
+;           CB    HR1
+;           |     |
+; \--CLP -- NL -- CR -- HR2
+;    ||           |
+;    OL           HR3
+
+[ STC ]
+ [ atoms ]
+           CLP   TC    0.51  0
+           OL    O    -0.51  1
+           NL    NH1  -0.42  2
+           CB    CT3  -0.06  3
+           HB1   HA3   0.09  4
+           HB2   HA3   0.09  5
+           HB3   HA3   0.09  6
+           CR    CT3  -0.06  7
+           HR1   HA3   0.09  8
+           HR2   HA3   0.09  9
+           HR3   HA3   0.09 10
+ [ bonds ]
+           CLP   NL
+           NL    CR
+           CLP   OL
+           NL    CB
+           CB    HB1
+           CB    HB2
+           CB    HB3
+           CR    HR1
+           CR    HR2
+           CR    HR3
+
+ [ impropers ]
+           CLP  -CA   NL  OL
+           NL    CR   CLP  CB
+
+; STN (CH3 terminated c-term)
+;
+;        HL1   OL     CB
+;        |     ||     |
+; HL2 -- CL -- CLP -- NL -- CA --\
+;        |
+;        HL2
+;
+
+[ STN ]
+ [ atoms ]
+           CL    CT3  -0.27 0
+           HL1   HA3   0.09 1
+           HL2   HA3   0.09 2
+           HL3   HA3   0.09 3
+           CLP   TC    0.51 4
+           OL    O    -0.51 5
+           NL    NH1  -0.42 6
+           CB    CT3  -0.06 7
+           HB1   HA3   0.09 8
+           HB2   HA3   0.09 9
+           HB3   HA3   0.09 10
+           CA    CT2   0.03 11
+           HA1   HB2   0.09 12
+           HA2   HB2   0.09 13
+
+ [ bonds ]
+           CL    CLP
+           CLP   NL
+           NL    CA
+           CLP   OL
+           NL    CB
+           CA    HA1
+           CA    HA2
+           CL    HL1
+           CL    HL2
+           CL    HL3
+           CB    HB1
+           CB    HB2
+           CB    HB3
+           CA   +CLP
+ [ impropers ]
+           CLP   CL   NL  OL
+           NL    CLP  CA  CB

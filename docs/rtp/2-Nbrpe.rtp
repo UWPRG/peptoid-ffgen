@@ -2,7 +2,7 @@
 ;
 ;  ### CONTENTS ###
 ; BTM : middle
-; BTC : CH3 terminated c-term)
+; BTC : CH3 terminated c-term
 ; BTN : CH3 terminated n-term
 ; BTV : CH2-CO-NH2 terminated c-term *used to be BNR
 ; BTB : NH terminated n-term         *used to be BCR
@@ -54,15 +54,13 @@
            CH    CG2R61 -0.03 21
            BRL   BRGR1  -0.10 22
  [ bonds ]
-           CA   -CLP
            CLP   NL
-           NL    CA
            CLP   OL
+           NL    CA
            NL    CB
            CB    CG
            CG    CD
            CD    CE1
-           CD    CE2
            CE1   CZ1
            CZ1   CH
            CH    BRL
@@ -78,9 +76,10 @@
            CE2   HE2
            CZ1   HZ1
            CZ2   HZ2
-           CLP  +CA
+           CA   +CLP
  [ impropers ]
-           NL    CLP CA  CB
+           NL    CLP  CA  CB
+           CLP  -CA   NL  OL
 
 ; BTC (CH3 terminated c-term)
 ;
@@ -153,7 +152,7 @@
            CE2   HE2
            CZ1   HZ1
            CZ2   HZ2
-           CLP  -CA
+
   [ impropers ]
            CLP  -CA   NL  OL
            NL    CLP  CR  CB
@@ -236,7 +235,7 @@
            CE2   HE2
            CZ1   HZ1
            CZ2   HZ2
-           CLP   -CA
+           CA   +CLP
  [ impropers ]
            CLP   CL  NL  OL
            NL    CLP CA  CB
@@ -296,8 +295,8 @@
           CLP    NR
           CLP    OL
            NL    CB
-           NL    CA1
-          CA1    CP2
+           NL    CA
+           CA    CP2
           CP2    OL2
           CP2    NT
            CB    CG
@@ -309,8 +308,8 @@
            CH    BRL
            CH    CZ2
            CZ2   CE2
-          CA1    HA1
-          CA1    HA2
+           CA    HA1
+           CA    HA2
            CB    HB1
            CB    HB2
            CG    HG1
@@ -322,8 +321,9 @@
            NT    HN1
            NT    HN2
  [ impropers ]
-           CLP +CA   NL  OL
-           CP2  CA1  NT  OL2
+           CLP  -CA   NL  OL
+           CP2   CA   NT  OL2
+           NL    CLP  CA  CB
 
 ; BTB (NH terminated n-term)
 ;
@@ -368,7 +368,6 @@
          HA1   HB2     0.09 20
          HA2   HB2     0.09 21
  [ bonds ]
-           CA   -CLP
            NL    HN1
            NL    CA
            NL    CB
@@ -391,9 +390,10 @@
            CE2   HE2
            CZ1   HZ1
            CZ2   HZ2
+           CA   +CLP
  [ impropers ] ; no improper dihed at n-term
 
-; BLM (MIDDLE w/ LP)
+; BLM (middle w/ LP)
 ;           LP
 ;           |
 ;           BRL
@@ -435,12 +435,11 @@
            HZ1   HGR61   0.14 18
            CZ2   CG2R61 -0.07 19
            HZ2   HGR61   0.14 20
-           CH    CG2R61  0.00 21
-           BRL   BRGR1  -0.18 22
+           CH    CG2R61 -0.02 21
+           BRL   BRGR1  -0.16 22
            LP    LPH     0.05 23
 
  [ bonds ]
-           CA   -CLP
            CLP   NL
            NL    CA
            CLP   OL
@@ -465,9 +464,10 @@
            CE2   HE2
            CZ1   HZ1
            CZ2   HZ2
-           CLP  +CA
+           CA   +CLP
  [ impropers ]
-           NL    CLP CA  CB
+           NL    CLP  CA  CB
+           CLP   -CA  NL  OL
 
 ; BLV (CH2-CO-NH2 terminated c-term w/ LP)
 ;
@@ -514,8 +514,8 @@
            HZ1 HGR61   0.14 18
            CZ2 CG2R61 -0.07 19
            HZ2 HGR61   0.14 20
-           CH  CG2R61  0.00 21
-           BRL BRGR1  -0.18 22
+           CH  CG2R61 -0.02 21
+           BRL BRGR1  -0.16 22
            CP2 TC      0.51 23
            OL2 O      -0.51 24
             NT NG2S2  -0.62 25
@@ -523,12 +523,11 @@
            HN2 HGP1    0.31 27
            LP  LPH     0.05 28
  [ bonds ]
-          CLP   +CA
-          CLP    NR
+          CLP    NL
           CLP    OL
            NL    CB
-           NL    CA1
-          CA1    CP2
+           NL    CA
+          CA     CP2
           CP2    OL2
           CP2    NT
            CB    CG
@@ -541,8 +540,8 @@
            BRL   LP
            CH    CZ2
            CZ2   CE2
-          CA1    HA1
-          CA1    HA2
+           CA    HA1
+           CA    HA2
            CB    HB1
            CB    HB2
            CG    HG1
@@ -554,8 +553,9 @@
            NT    HN1
            NT    HN2
  [ impropers ]
-           CLP +CA   NL  OL
-           CP2  CA1  NT  OL2
+           CLP  -CA    NL   OL
+           CP2   CA    NT   OL2
+           NL    CLP   CA   CB
 
 ; BLB (NH terminated n-term)
 ;
@@ -579,31 +579,30 @@
 
 [ BTB ]
  [ atoms ]
-         NL    NH1    -0.47 0 ; adjusted for NH backbone (cgenff)
-         HN1   H       0.31 1 ; comes from NH backbone   (cgenff)
-         CB    CT2    -0.04 2
-         HB1   HA2     0.09 3
-         HB2   HA2     0.09 4
-         CG    CT2    -0.12 5
-         HG1   HA2     0.09 6
-         HG2   HA2     0.09 7
-         CD    CG2R61  0.00 8
-         CE1   CG2R61 -0.12 9
-         CE2   CG2R61 -0.12 10
-         CZ1   CG2R61 -0.07 11
-         CZ2   CG2R61 -0.07 12
-         CH    CG2R61  0.00 13
-         HE1   HGR61   0.12 14
+         NL    NH1    -0.65 0 ; adjusted for NH backbone (cgenff)
+         HN1   H       0.33 1 ; comes from NH backbone   (cgenff)
+         CA    CT2    -0.05 2 ; adjusted for NH backbone (cgenff)
+         HA1   HB2     0.09 3
+         HA2   HB2     0.09 4
+         CB    CT2     0.00 5
+         HB1   HA2     0.09 6
+         HB2   HA2     0.09 7
+         CG    CT2    -0.18 8
+         HG1   HA2     0.09 9
+         HG2   HA2     0.09 10
+         CD    CG2R61  0.00 11
+         CE1   CG2R61 -0.12 12
+         HE1   HGR61   0.12 13
+         CE2   CG2R61 -0.12 14
          HE2   HGR61   0.12 15
-         HZ1   HGR61   0.14 16
-         HZ2   HGR61   0.14 17
-         BRL   BRGR1  -0.18 18
-         CA    CT2    -0.13 19 ; adjusted for NH backbone (cgenff)
-         HA1   HB2     0.09 20
-         HA2   HB2     0.09 21
+         CZ1   CG2R61 -0.07 16
+         HZ1   HGR61   0.14 17
+         CZ2   CG2R61 -0.07 18
+         HZ2   HGR61   0.14 19
+         CH    CG2R61 -0.02 20
+         BRL   BRGR1  -0.16 21
          LP    LPH     0.05 22
  [ bonds ]
-           CA   -CLP
            NL    HN1
            NL    CA
            NL    CB
@@ -627,4 +626,5 @@
            CE2   HE2
            CZ1   HZ1
            CZ2   HZ2
+           CA   +CLP
  [ impropers ] ; no improper dihed at n-term
