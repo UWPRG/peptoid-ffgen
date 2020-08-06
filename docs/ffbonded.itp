@@ -113,8 +113,13 @@
      TC      CT2     NH1     CT3     9         180.0     3.3472  2
      TC      CT2     NH1     CT2     9         180.0     3.3472  2
 ;
-; CHI for unique peptoid chemistries ***NEED TO ADD AND CITE SANTISO***
-;
+; CHI for unique peptoid chemistries
+; for N1brpe
+     CT2       NH1       CT2       CG2R61    9     0.00      1.6736     2 ; from weiser/santiso
+; for N1spe
+     CT2       NH1       CT2       CT3       9     0.00      1.6736     1 ; from weiser/santiso
+     CT2       NH1       CT2       CT3       9     0.00      0.8368     2 ; from weiser/santiso
+     CT2       NH1       CT2       CT3       9     180.00    1.2552     3 ; from weiser/santiso
 ; additional CGENFF dihedrals needed for NH2 termini (Sarah Alamdari)
      O         TC        NG2S2     HGP1      9     180.00    5.858      2
      CT2       TC        NG2S2     HGP1      9     180.00    5.858      2
@@ -132,7 +137,7 @@
 ; ### RELEVANT EQUATIONS ###
 ; improper func2 = 1/2 * kphi * (phi - phi0)**2
 ; keta(gromacs) = keta(charmm) *2 *4.184kJ/kcal
-; keta0(gromacs) = eta0(charmm)
+; eta0(gromacs) = eta0(charmm)
 ; ### NEW PARAMS ###
 ; General Peptoid Improper dihedral
 ;      i        j        k        l  func         eta0 [deg]         keta [kJ/mol/rad^2]
