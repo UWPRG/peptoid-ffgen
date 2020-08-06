@@ -1,0 +1,6 @@
+; add to charmm FF  (we used charmm36-nov2016.ff)
+
+[ atomtypes ]
+;type atnum         mass   charge ptype           sigma  epsilon
+;peptoid paramter from Mirijanian et al. (Janani Sampath)
+TC       6    12.01100      0.51   A  0.302905564168  0.46024
