@@ -102,7 +102,7 @@ def read_log_into_lists(logfile, post_hartree_fock):
     # Delete first and third columns from coordinates.
     cartcoords = np.array(cartcoords, dtype=np.float)
     cartcoords = np.delete(cartcoords, [0, 2] ,axis=2)
-    return cartcoords, step_num
+    return cartcoords, step_num, energy
 
 
 def determine_and_save_frames(scan, full, step_num):
