@@ -33,9 +33,3 @@ other?
 - B : n-term amide
 - I : intermediate (b/w middle and N-term) - alkyl tail only
 - T : interchangeable c/n-term - alkyl tail only
-
-
-**  TO DO LIST ***
--> go through all impropers? (why sometimes two why sometimes only 1)
--> check numbering on atoms
-->
