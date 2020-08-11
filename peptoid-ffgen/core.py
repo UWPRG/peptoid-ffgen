@@ -184,7 +184,6 @@ def mdrun(mpirun, deffnm, plumed, np=1):
     commands = [mpi, "mdrun", "-deffnm", deffnm, "-plumed", plumed]
 
     subprocess.run(commands, stdout=logfile)
-          mpirun -np 1 gmx_mpi mdrun -deffnm em -plumed plumed.dat
     return
 
 def launch_md(engine="GROMACS"):

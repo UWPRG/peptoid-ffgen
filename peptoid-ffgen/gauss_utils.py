@@ -6,7 +6,7 @@ import numpy as np
 
 def fortrandouble(x):
     """Converts string of Fortran double scientific notation to python float.
-    
+
     Example
     -------
     >>> val = '-0.12345D+03'
@@ -38,7 +38,7 @@ def check_post_hartree_fock(post_hartree_fock):
     else:
         return False
 
-def read_log_into_lists(logfile, post_hartree_fock):
+def read_log_into_lists(logfile, post_hartree_fock, no_energy):
     """Read the log file into lists.
 
     Paramters
@@ -48,7 +48,7 @@ def read_log_into_lists(logfile, post_hartree_fock):
     logfile : str
 	String with  full name of log file including extension
 
-    
+
 
     Returns
     -------
@@ -56,7 +56,7 @@ def read_log_into_lists(logfile, post_hartree_fock):
         array with modifictions (1st and 3rd columns deleted from coordinates).
     step_num : list of lists
     energy : list of lists
-    
+
 
     """
     post_HF_options = {'MP2': 'EUMP2', 'MP3': 'EUMP3'}
@@ -114,13 +114,13 @@ def determine_and_save_frames(scan, full, step_num):
     full : bool
 	boolean on saving all frames (Defuault = True)
     step_num : list of lists
-	 
-    
-    
+
+
+
     Returns
     -------
     save_frames : list
-    
+
 
     """
     #Determine which frames to write to file.
@@ -159,7 +159,7 @@ def write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartco
     Paramters
     ---------
     outfile : str
-	str that contains name of file without extension 
+	str that contains name of file without extension
     overwrite : bool
         denotes whether or not output file overwrites previous file of same name (Default = True)
     last_frame: bool
@@ -170,8 +170,8 @@ def write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartco
     cartcoords : array
     step_num : list of lists
     energy : array
-    
-     
+
+
     """
     element_dict = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N',
                     8: 'O', 9: 'F', 10: 'Ne', 11: 'Na', 16: 'S'}
@@ -236,7 +236,7 @@ def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_nu
     save_frames : list
      list of frame indices
     cartcoords : array
-        xyz coordinates 
+        xyz coordinates
     step_num : list of lists
        list of lists containing current and max iterations
     energy : array
@@ -261,40 +261,42 @@ def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_nu
             for line in cartcoords[f]:
                 element = element_dict[int(line[0])]
                 outf.write(' {0:s}\t\t\t{1: 2.5f}  {2: 2.5f}  {3: 2.5f}\n'\
-                           .format(element, *line[1:]))                
-    
+                           .format(element, *line[1:]))
+
     return
 
 
-def parse_logfile(scan, logfile, overwrite, full, no_energy, last_frame, post_hartree_fock, outfile):
-     """Parsing the logfile, wrapper function.
+def parse_logfile(logfile, outfile, post_hartree_fock="", multiple_files=True, full=True,
+                  no_energy=False, last_frame=False, overwrite=True, scan=True):
+    """Parsing the logfile, wrapper function.
     Parameters
     ----------
-    scan : bool
-        boolean on scan calculation (Default = True)
     logfile : string
-        String with  full name of log file including extension
-    overwrite : bool
-        denotes whether or not output file overwrites previous file of same name (Default = True)
+        string with  full name of log file including extension
+    outfile : str
+        str that contains name of outfile without extension
+    post_hartree_fock : str
+        post-HF level used (example='MP2' or 'MP3' else leave blank)
+    multiple_files : bool
+        option to write coordinates to seperate files or single file
     full : bool
         denotes saving all frames (Defuault = True)
     no_energy : bool
         Enabling turns off recording of energy (Default = False)
     last_frame: bool
         denotes whether to save only the last frame (Default = False)
-    post_hartree_fock : str
-        String of post-HF level
-    outfile : str
-        str that contains name of file without extension
-    
+    overwrite : bool
+        denotes whether or not output file overwrites previous file of same name (Default = True)
+    scan : bool
+        boolean on scan calculation (Default = True)
     """
     check_post_hartree_fock(post_hartree_fock)
 
-    cartcoords, step_num, energy = read_log_into_lists(logfile, post_hartree_fock)
+    cartcoords, step_num, energy = read_log_into_lists(logfile, post_hartree_fock, no_energy)
 
     save_frames = determine_and_save_frames(scan, full, step_num)
 
     if multiple_files:
         write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_num, energy)
-    else: 
+    else:
         write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartcoords, step_num, energy)
