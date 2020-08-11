@@ -44,20 +44,22 @@ def read_log_into_lists(logfile, post_hartree_fock, no_energy):
     Paramters
     ---------
     post_hartree_fock : str
+        *ADD DESCRIPTION*
 	String of post-HF level
+        *ADD DESCRIPTION*
     logfile : str
-	String with  full name of log file including extension
-
-
+	   String with  full name of log file including extension
+    no_energy : bool
+        Enabling turns off recording of energy (Default = False)
 
     Returns
     -------
     cartcoords : array
         array with modifictions (1st and 3rd columns deleted from coordinates).
     step_num : list of lists
+        *ADD DESCRIPTION*
     energy : list of lists
-
-
+        *ADD DESCRIPTION*
     """
     post_HF_options = {'MP2': 'EUMP2', 'MP3': 'EUMP3'}
     cartcoords = []
@@ -106,7 +108,7 @@ def read_log_into_lists(logfile, post_hartree_fock, no_energy):
 
 
 def determine_and_save_frames(scan, full, step_num):
-    """Determine which frames to write to file.Save all frames, even if it is a scan calculation.
+    """Determine which frames to write to file. Save all frames, even if it is a scan calculation.
     Parameters
     ----------
     scan : bool
@@ -114,8 +116,6 @@ def determine_and_save_frames(scan, full, step_num):
     full : bool
 	boolean on saving all frames (Defuault = True)
     step_num : list of lists
-
-
 
     Returns
     -------
@@ -230,11 +230,11 @@ def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_nu
     Paramters
     ---------
     outfile : str
-	str that contains name of file without extension
+	   str that contains name of file without extension
     no_energy : bool
         Enabling turns off recording of energy (Default = False)
     save_frames : list
-     list of frame indices
+        list of frame indices
     cartcoords : array
         xyz coordinates
     step_num : list of lists
@@ -266,7 +266,7 @@ def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_nu
     return
 
 
-def parse_logfile(logfile, outfile, post_hartree_fock="", multiple_files=True, full=True,
+def parse_logfile(logfile, outfile, post_hartree_fock="", multiple_files=True, full=False,
                   no_energy=False, last_frame=False, overwrite=True, scan=True):
     """Parsing the logfile, wrapper function.
     Parameters
@@ -278,9 +278,9 @@ def parse_logfile(logfile, outfile, post_hartree_fock="", multiple_files=True, f
     post_hartree_fock : str
         post-HF level used (example='MP2' or 'MP3' else leave blank)
     multiple_files : bool
-        option to write coordinates to seperate files or single file
+        option to write coordinates to seperate files or single file (Default = True; writes each scan coordinate to separate file)
     full : bool
-        denotes saving all frames (Defuault = True)
+        denotes saving all frames (True) or optimized frames (False) (Defuault = False)
     no_energy : bool
         Enabling turns off recording of energy (Default = False)
     last_frame: bool
@@ -293,9 +293,8 @@ def parse_logfile(logfile, outfile, post_hartree_fock="", multiple_files=True, f
     check_post_hartree_fock(post_hartree_fock)
 
     cartcoords, step_num, energy = read_log_into_lists(logfile, post_hartree_fock, no_energy)
-
     save_frames = determine_and_save_frames(scan, full, step_num)
-
+    #print(step_num, len(step_num), save_frames, len(save_frames)
     if multiple_files:
         write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_num, energy)
     else:
