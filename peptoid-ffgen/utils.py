@@ -1,5 +1,6 @@
-import pandas as pd
 import numpy as np
+import os
+import pandas as pd
 
 ##### General Utilities #####
 # Helper functions for core.py
@@ -76,3 +77,8 @@ def xyz_to_scan(log2xyz_outfile, coord):
     scan['kcal'] = scan['hartree']*ht_to_kcal
 
     return scan
+
+def check_path_exists(file):
+    directory = file.split(sep='/')[0] # only works on first dir in path
+    if not os.path.exists(directory):
+        os.makedirs(directory)

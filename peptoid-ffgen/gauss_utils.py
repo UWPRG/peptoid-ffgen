@@ -6,7 +6,7 @@ import numpy as np
 
 def fortrandouble(x):
     """Converts string of Fortran double scientific notation to python float.
-    
+
     Example
     -------
     >>> val = '-0.12345D+03'
@@ -38,26 +38,28 @@ def check_post_hartree_fock(post_hartree_fock):
     else:
         return False
 
-def read_log_into_lists(logfile, post_hartree_fock):
+def read_log_into_lists(logfile, post_hartree_fock, no_energy):
     """Read the log file into lists.
 
     Paramters
     ---------
     post_hartree_fock : str
+        *ADD DESCRIPTION*
 	String of post-HF level
+        *ADD DESCRIPTION*
     logfile : str
-	String with  full name of log file including extension
-
-    
+	   String with  full name of log file including extension
+    no_energy : bool
+        Enabling turns off recording of energy (Default = False)
 
     Returns
     -------
     cartcoords : array
         array with modifictions (1st and 3rd columns deleted from coordinates).
     step_num : list of lists
+        *ADD DESCRIPTION*
     energy : list of lists
-    
-
+        *ADD DESCRIPTION*
     """
     post_HF_options = {'MP2': 'EUMP2', 'MP3': 'EUMP3'}
     cartcoords = []
@@ -106,7 +108,7 @@ def read_log_into_lists(logfile, post_hartree_fock):
 
 
 def determine_and_save_frames(scan, full, step_num):
-    """Determine which frames to write to file.Save all frames, even if it is a scan calculation.
+    """Determine which frames to write to file. Save all frames, even if it is a scan calculation.
     Parameters
     ----------
     scan : bool
@@ -114,13 +116,11 @@ def determine_and_save_frames(scan, full, step_num):
     full : bool
 	boolean on saving all frames (Defuault = True)
     step_num : list of lists
-	 
-    
-    
+
     Returns
     -------
     save_frames : list
-    
+
 
     """
     #Determine which frames to write to file.
@@ -159,7 +159,7 @@ def write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartco
     Paramters
     ---------
     outfile : str
-	str that contains name of file without extension 
+	str that contains name of file without extension
     overwrite : bool
         denotes whether or not output file overwrites previous file of same name (Default = True)
     last_frame: bool
@@ -170,8 +170,8 @@ def write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartco
     cartcoords : array
     step_num : list of lists
     energy : array
-    
-     
+
+
     """
     element_dict = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N',
                     8: 'O', 9: 'F', 10: 'Ne', 11: 'Na', 16: 'S'}
@@ -230,13 +230,13 @@ def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_nu
     Paramters
     ---------
     outfile : str
-	str that contains name of file without extension
+	   str that contains name of file without extension
     no_energy : bool
         Enabling turns off recording of energy (Default = False)
     save_frames : list
-     list of frame indices
+        list of frame indices
     cartcoords : array
-        xyz coordinates 
+        xyz coordinates
     step_num : list of lists
        list of lists containing current and max iterations
     energy : array
@@ -247,54 +247,19 @@ def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_nu
     element_dict = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N',
                     8: 'O', 9: 'F', 10: 'Ne', 11: 'Na', 16: 'S'}
 
-
     for i, f in enumerate(save_frames):
         #Append a number to outfile to note which frame
         single_frame_file = outfile + str(i) + '.xyz'
         with open(single_frame_file, 'w') as outf:
-            outf.write('{}\n'.format(len(cartcoords[f])))
-            if no_energy:
-                outf.write('i = {0:3d}\n'.format(step_num[f][-2]))
-            else:
-                outf.write('i = {0:3d}, E = {1: >17.12f}\n'
-                           .format(step_num[f][-2], energy[f]))
+            #outf.write('{}\n'.format(len(cartcoords[f])))
+            #if no_energy:
+            #    outf.write('i = {0:3d}\n'.format(step_num[f][-2]))
+            #else:
+            #    outf.write('i = {0:3d}, E = {1: >17.12f}\n'
+            #               .format(step_num[f][-2], energy[f]))
             for line in cartcoords[f]:
                 element = element_dict[int(line[0])]
                 outf.write(' {0:s}\t\t\t{1: 2.5f}  {2: 2.5f}  {3: 2.5f}\n'\
-                           .format(element, *line[1:]))                
-    
+                           .format(element, *line[1:]))
+
     return
-
-
-def parse_logfile(scan, logfile, overwrite, full, no_energy, last_frame, post_hartree_fock, outfile):
-     """Parsing the logfile, wrapper function.
-    Parameters
-    ----------
-    scan : bool
-        boolean on scan calculation (Default = True)
-    logfile : string
-        String with  full name of log file including extension
-    overwrite : bool
-        denotes whether or not output file overwrites previous file of same name (Default = True)
-    full : bool
-        denotes saving all frames (Defuault = True)
-    no_energy : bool
-        Enabling turns off recording of energy (Default = False)
-    last_frame: bool
-        denotes whether to save only the last frame (Default = False)
-    post_hartree_fock : str
-        String of post-HF level
-    outfile : str
-        str that contains name of file without extension
-    
-    """
-    check_post_hartree_fock(post_hartree_fock)
-
-    cartcoords, step_num, energy = read_log_into_lists(logfile, post_hartree_fock)
-
-    save_frames = determine_and_save_frames(scan, full, step_num)
-
-    if multiple_files:
-        write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_num, energy)
-    else: 
-        write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartcoords, step_num, energy)
