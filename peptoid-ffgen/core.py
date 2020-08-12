@@ -1,7 +1,10 @@
+import fileinput
 import os
 import pandas as pd
-import gauss_utils as gu
-import utils as u
+import pipesubprocess as pipesub
+import shutil
+from gauss_utils import *
+from utils import *
 
 ##### Main Functions #####
 
@@ -45,24 +48,25 @@ def parse_logfile(logfile, output_dir, scan_atoms, post_hartree_fock="",
     energy : list
         qm energy from run (in Hartree)
     """
-    u.check_path_exists(output_dir)
+    check_path_exists(output_dir)
 
-    gu.check_post_hartree_fock(post_hartree_fock)
+    check_post_hartree_fock(post_hartree_fock)
 
-    cartcoords, step_num, energy = gu.read_log_into_lists(logfile, post_hartree_fock, no_energy)
+    cartcoords, step_num, energy = read_log_into_lists(logfile, post_hartree_fock, no_energy)
 
-    save_frames = gu.determine_and_save_frames(step_num, full, scan)
+    save_frames = determine_and_save_frames(step_num, full, scan)
 
     if multiple_files:
-        scan_energy = gu.write_to_multiple_files(output_dir+outfile, save_frames,
+        scan_energy = write_to_multiple_files(output_dir+outfile, save_frames,
                                    cartcoords, step_num, energy)
     else:
-        gu.write_to_file(output_dir+outfile, overwrite, last_frame, save_frames,
+        write_to_file(output_dir+outfile, overwrite, last_frame, save_frames,
                          cartcoords, step_num, energy)
 
-    scan_coord = gu.get_scan_coord(logfile, scan_atoms)
+    scan_coord = get_scan_coord(logfile, scan_atoms)
 
     return scan_coord, scan_energy # need this
+
 
 ### Convert Gaussian xyz to Gromacs pdb ###
 
@@ -72,7 +76,8 @@ def parse_xyz(xyz_dir, hash_table, skel_file, output_dir, file_index=1,
     A wrapper for gen_pdb to be run on multiple xyz files that are all located
     in the same dir
 
-    Inputs
+    Parameters
+    ----------
     xyz_dir : str
         Directory where all processed xyz files are located
     hash_table : dictionary
@@ -97,12 +102,14 @@ def parse_xyz(xyz_dir, hash_table, skel_file, output_dir, file_index=1,
         gen_pdb(xyz_file, hash_table=hash_table, skel_file=skel_file,
                 output_dir=output_dir, file_index=i, file_type='pdb')
 
+
 def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index,
             file_type='pdb'):
     """
     Reads in an xyz file and returns a formatted pdb file
 
-    Inputs
+    Parameters
+    ----------
     xyz_file : xyz coordinate file
         Output of log2xyz
     hash_table : dictionary
@@ -121,7 +128,7 @@ def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index,
         Determines type of output, only handles PDB files for now
     """
 
-    u.check_path_exists(output_dir)
+    check_path_exists(output_dir)
 
     if file_type == 'pdb':
         f_type = '.pdb'
@@ -207,28 +214,92 @@ def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index,
     # write to file
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    with open(output_dir+str(file_index)+"_names"+f_type, "w") as outfile:
+    with open(output_dir+str(file_index)+f_type, "w") as outfile:
         outfile.write(header+write_string+footer)
 
     return
 
+
 ### Functions for running MD on GROMACS ###
 
-def run_md(engine="GROMACS"):
-    # recode wrapper script here
+def run_md(scan_coord, mpirun, md_dir='md/'):
+    """
+    Wrapper for running energy minimization for each scan coordinate. Only runs
+    with Gromacs.
 
-    # symbolic link charmm directory
+    Parameters
+    ----------
+    scan_coord : list
+        list of scan coordinates
+    md_dir : str
+        directory name where md will run and be stored
+    """
 
-    #
+    # setup MD
+    setup_runs(scan_coord)
+
+    # run MD
+
+    for i, s in enumerate(scan_coord):
+        top_dir = os.getcwd()+"/"
+
+        # symbolically link charmm ff from skel folder
+        src = top_dir+"skel/"+"charmm36-nov2016.ff/"
+        dst = top_dir+"md/"+str(i)+"/charmm36-nov2016.ff"
+        if check_path_exists(dst):
+            os.symlink(src, dst)
+
+        i_pdb = 'pdb/'+str(i)+'.pdb'
+
+        # cd into directory and do some md
+        with cd(top_dir+"md/"+str(i)):
+            pdb2gmx(mpirun, input_pdb=str(i)+'.pdb', output_gro=str(i)+'.gro')
+            editconf(mpirun, input_gro=str(i)+'.gro', output_gro='box.gro')
+            make_ndx(mpirun, index_input='box.gro') # how do i make this w/o running MD?
+            grompp(mpirun, mdp='em.mdp', coord='box.gro', tpr='em.tpr')
+            mdrun(mpirun, deffnm='em', plumed='plumed.dat')
+
+    # grep from colvar files for md_energy
 
     return
 
+
+def setup_runs(scan_coord, md_dir='md/'):
+    """
+    Generates folders for md runs based on number of scan coordinates
+
+    Parameters
+    ----------
+    scan_coord : list
+        list of scan coordinates
+    md_dir : str
+        directory name where md will run and be stored
+    """
+    for i, s in enumerate(scan_coord):
+        check_path_exists(md_dir)
+        i_scan_dir = md_dir+str(i)+"/"
+        check_path_exists(i_scan_dir)
+        i_pdb = 'pdb/'+str(i)+'.pdb'
+
+        shutil.copyfile(i_pdb, i_scan_dir+str(i)+'.pdb')
+        shutil.copyfile('skel/em.mdp', i_scan_dir+'em.mdp')
+
+        ## ** JOSHUA REWRITE (or supplement) w/ python funcs to be more modular (vs relying on user setup) ** ##
+        shutil.copyfile('skel/plumed.dat', i_scan_dir+'plumed.dat')
+        plumed_find = 'XXX'
+        with fileinput.FileInput(i_scan_dir+'plumed.dat', inplace=True, backup='.bak') as f_plumed:
+            for line in f_plumed:
+                print(line.replace(plumed_find, str(scan_coord[i])))
+        ## ** end rewrite section ** ##
+    return
+
 def grompp(mpirun, mdp, coord, tpr, index="index.ndx", topol="topol.top",
-           maxwarn=1, np=1, logfile="stdout.log"):
+           maxwarn=1, np=1):
     """
     Python wrapper for gmx grompp
 
-    Inputs
+    Parameters
+    ----------
     mpirun : Bool
         Is this a multi-node run or not (gmx vs gmx_mpi), if True must specify
         number of processes (np)
@@ -244,14 +315,17 @@ def grompp(mpirun, mdp, coord, tpr, index="index.ndx", topol="topol.top",
         Filename of topology file (Default topol.top)
     maxwarn : int
         Maximum number of acceptable warnings when grompping
+    mpirun : bool
+        Is this a multi-node run or not gmx (False) vs gmx_mpi (Default: True)
+        number of processes (np)
     np : int
         Number of processes to run mpirun on (Default 1 for non-mpi run)
     """
 
     if mpirun == True:
-        mpi = "mpirun " + "np " + np + "gmx_mpi "
+        mpi = "mpirun " + "np " + str(np) + "gmx_mpi"
     elif mpirun == False:
-        mpi = "gmx "
+        mpi = "gmx"
     else:
         print ("mpirun only takes bool as input")
 
@@ -259,33 +333,104 @@ def grompp(mpirun, mdp, coord, tpr, index="index.ndx", topol="topol.top",
                 topol, "-c", coord, "-o", tpr, "-n", index,
                 "-maxwarn", maxwarn]
 
-    subprocess.run(commands, stdout=logfile)
+    subprocess.run(commands)
     return
+
 
 def mdrun(mpirun, deffnm, plumed, np=1):
     """
     Python wrapper for gmx mdrun -deffnm
 
-    Inputs
-    mpirun : Bool
-        Is this a multi-node run or not (gmx vs gmx_mpi), if True must specify
-        number of processes (np)
+    Parameters
+    ----------
     deffnm : str
          File names for md run
     plumed : str
         name of plumed file
+    mpirun : bool
+        Is this a multi-node run or not gmx (False) vs gmx_mpi (Default: True)
+        number of processes (np)
     np : int
         Number of processes to run mpirun on (Default 1 for non-mpi run)
     """
 
     if mpirun == True:
-        mpi = "mpirun " + "np " + np + "gmx_mpi "
+        mpi = "mpirun " + "np " + str(np) + " gmx_mpi"
     elif mpirun == False:
-        mpi = "gmx "
+        mpi = "gmx"
     else:
         print ("mpirun only takes bool as input")
 
     commands = [mpi, "mdrun", "-deffnm", deffnm, "-plumed", plumed]
 
-    subprocess.run(commands, stdout=logfile)
+    subprocess.run(commands)
+    return
+
+def make_ndx(mpirun, index_input, np=1):
+    """
+    Python wrapper for gmx make_ndx
+
+    Parameters
+    ----------
+    index_input : str
+        file (with extension) used for gmx make_ndx
+    mpirun : bool
+        Is this a multi-node run or not gmx (False) vs gmx_mpi (Default: True)
+        number of processes (np)
+    np : int
+        Number of processes to run mpirun on (Default 1 for non-mpi run)
+    """
+
+    if mpirun == True:
+        mpi = "mpirun " + "np " + str(np) + " gmx_mpi"
+    elif mpirun == False:
+        mpi = "gmx"
+    else:
+        print ("mpirun only takes bool as input")
+
+    commands = [mpi, "make_ndx", "-f", index_input]
+    subprocess.run(commands)
+    #pipesub.run(commands, "q") # "q" == "quit"
+    return
+
+def pdb2gmx(mpirun, input_pdb, output_gro, np=1):
+    """
+    Python wrapper for gmx pdb2gmx
+
+    Parameters
+    ----------
+    """
+
+    if mpirun == True:
+        mpi = "mpirun " + "np " + str(np) + " gmx_mpi"
+    elif mpirun == False:
+        mpi = "gmx"
+    else:
+        print ("mpirun only takes bool as input")
+
+    commands = [mpi, "pdb2gmx", "-f", input_pdb, "-o", output_gro]
+    pipesub.run(commands, 1) # selects FF in current directory
+
+    return
+
+def editconf(mpirun, input_gro, output_gro, distance=1.3, np=1):
+    """
+    Python wrapper for gmx editconf
+
+    Parameters
+    ----------
+    distance : int
+        distance between solute and box (default 1.3)
+    """
+
+    if mpirun == True:
+        mpi = "mpirun " + "np " + str(np) + " gmx_mpi"
+    elif mpirun == False:
+        mpi = "gmx"
+    else:
+        print ("mpirun only takes bool as input")
+
+    commands = [mpi, "editconf", "-f", input_gro, "-o", output_gro, '-c', '-d', distance]
+    subprocess.run(commands) # selects FF in current directory
+
     return

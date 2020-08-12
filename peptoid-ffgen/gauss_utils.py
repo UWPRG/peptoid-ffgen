@@ -280,12 +280,19 @@ def get_scan_coord(logfile, scan_atoms, scan_dihedral=True):
     """
     Gets values for scan
 
-    logfile: str
+    Parameters
+    ----------
+    logfile : str
         string with  full name of log file including extension
     scan_atoms : list
         list of atoms used for scan
     scan_dihedral : bool
         indicates if a dihedral scan was performed (Default: True)
+
+    Returns
+    ----------
+    scan_coord : array
+        array of scan coordinates
 
     """
     if not scan_dihedral:
