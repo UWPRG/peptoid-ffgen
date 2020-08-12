@@ -1,10 +1,81 @@
 import os
 import pandas as pd
+import gauss_utils as gu
+import utils as u
 
 ##### Main Functions #####
 
-# log2xyz
-def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index=1,
+# Parse through Gaussian log file
+def parse_logfile(logfile, output_dir, post_hartree_fock="", multiple_files=True, full=False,
+                  no_energy=False, last_frame=False, overwrite=True, scan=True):
+    """Parsing the logfile, wrapper function.
+    Parameters
+    ----------
+    logfile : string
+        string with  full name of log file including extension
+    output_dir : str
+        str that contains name of output directory
+    post_hartree_fock : str
+        post-HF level used (example='MP2' or 'MP3' else leave blank)
+    multiple_files : bool
+        option to write coordinates to seperate files or single file (Default = True; writes each scan coordinate to separate file)
+    full : bool
+        denotes saving all frames (True) or optimized frames (False) (Defuault = False)
+    no_energy : bool
+        Enabling turns off recording of energy (Default = False)
+    last_frame: bool
+        denotes whether to save only the last frame (Default = False)
+    overwrite : bool
+        denotes whether or not output file overwrites previous file of same name (Default = True)
+    scan : bool
+        boolean on scan calculation (Default = True)
+    """
+    u.check_path_exists(output_dir)
+
+    gu.check_post_hartree_fock(post_hartree_fock)
+
+    cartcoords, step_num, energy = gu.read_log_into_lists(logfile, post_hartree_fock, no_energy)
+    save_frames = gu.determine_and_save_frames(scan, full, step_num)
+    if multiple_files:
+        gu.write_to_multiple_files(output_dir, save_frames, no_energy, cartcoords, step_num, energy)
+    else:
+        gu.write_to_file(output_dir, overwrite, last_frame, save_frames, no_energy, cartcoords, step_num, energy)
+
+    return energy # need this
+
+### Convert Gaussian xyz to Gromacs pdb ###
+
+def parse_xyz(xyz_dir, hash_table, skel_file, output_dir, file_index=1,
+            file_type='pdb', multiple_files=True):
+    """
+    a wrapper for gen_pdb to be run on multiple xyz files that are all located in the same dir
+
+    Inputs
+    xyz_dir : str
+        Directory where all processed xyz files are located
+    hash_table : dictionary
+        2D dictionary that maps the row name in xyz file to the correct
+        atom name and residue names
+    skel_file : PDB file
+        Contains sample PDB file with residues in correct order (coordinates
+        must be present but do not have to be correct)
+    output_dir : str
+        Where new PDB files will be output to
+    file_index : int
+        Used to index file names in the case of iterating over many files
+        (i.e. if editing all the xyz files in a scan). Default to 1, can pass
+        variable in a for loop format
+    file_type: str
+        Determines type of output, only handles PDB files for now
+    """
+    all_files = len([name for name in os.listdir(xyz_dir) if os.path.isfile(os.path.join(xyz_dir, name))])
+
+    for i in range(all_files):
+        xyz_file=xyz_dir+str(i)+".xyz"
+        gen_pdb(xyz_file, hash_table=hash_table, skel_file=skel_file,
+                output_dir=output_dir, file_index=i, file_type='pdb')
+
+def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index,
             file_type='pdb'):
     """
     Reads in an xyz file and returns a formatted pdb file
@@ -27,6 +98,8 @@ def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index=1,
     file_type: str
         Determines type of output, only handles PDB files for now
     """
+
+    u.check_path_exists(output_dir)
 
     if file_type == 'pdb':
         f_type = '.pdb'
@@ -95,7 +168,7 @@ def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index=1,
         s5=1*spacer # insertion of residues
         s6=3*spacer # between insertion and x coordinate
 
-        write_string+=(f'{f_a}{s1}{f_a_num:>5}{s2}{f_a_name:>3}{s3}{f_res_name:>3}{s4}{f_chainid}{f_res_num:>4}{s5}{s6}{f_x:8.3f}{f_y:8.3f}{f_z:8.3f}{f_occ:6.2f}{f_mass:6.2f}\n')
+        write_string+=(f"{f_a}{s1}{f_a_num:>5}{s2}{f_a_name:>3}{s3}{f_res_name:>3}{s4}{f_chainid}{f_res_num:>4}{s5}{s6}{f_x:8.3f}{f_y:8.3f}{f_z:8.3f}{f_occ:6.2f}{f_mass:6.2f}\n")
 
     with open(skel_file) as r:
         h_lines = r.readlines()[0:4]
@@ -117,7 +190,16 @@ def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index=1,
 
     return
 
-## Functions for running MD on GROMACS
+### Functions for running MD on GROMACS ###
+
+def launch_md(engine="GROMACS"):
+    # recode wrapper script here
+
+    # symbolic link charmm directory
+
+    #
+
+    return
 
 def grompp(mpirun, mdp, coord, tpr, index="index.ndx", topol="topol.top",
            maxwarn=1, np=1, logfile="stdout.log"):
@@ -184,13 +266,4 @@ def mdrun(mpirun, deffnm, plumed, np=1):
     commands = [mpi, "mdrun", "-deffnm", deffnm, "-plumed", plumed]
 
     subprocess.run(commands, stdout=logfile)
-    return
-
-def launch_md(engine="GROMACS"):
-    # recode wrapper script here
-
-    # symbolic link charmm directory
-
-    #
-
     return
