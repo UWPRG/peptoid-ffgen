@@ -161,7 +161,7 @@ def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index,
         for k,v in hash_table.items():
             #print (v)
             if v == value:
-                print("v == value", v, value, k)
+                #print("v == value", v, value, k)
                 parser_index = k - 1
 
                 # write to PDB (requires perfect formatting) --------------------
@@ -223,7 +223,7 @@ def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index,
 
 ### Functions for running MD on GROMACS ###
 
-def run_md(scan_coord, mpirun, md_dir='md/'):
+def run_md(scan_coord, scan_atoms, mpirun, plumed, md_dir='md/'):
     """
     Wrapper for running energy minimization for each scan coordinate. Only runs
     with Gromacs.
@@ -243,24 +243,30 @@ def run_md(scan_coord, mpirun, md_dir='md/'):
 
     for i, s in enumerate(scan_coord):
         top_dir = os.getcwd()+"/"
+        i_pdb = 'pdb/'+str(i)+'.pdb'
 
-        # symbolically link charmm ff from skel folder
+        # copy forcefield
         src = top_dir+"skel/"+"charmm36-nov2016.ff/"
         dst = top_dir+"md/"+str(i)+"/charmm36-nov2016.ff"
-        if check_path_exists(dst):
-            os.symlink(src, dst)
-
-        i_pdb = 'pdb/'+str(i)+'.pdb'
+        if not os.path.exists(dst):
+            shutil.copytree(src,dst)
 
         # cd into directory and do some md
         with cd(top_dir+"md/"+str(i)):
             pdb2gmx(mpirun, input_pdb=str(i)+'.pdb', output_gro=str(i)+'.gro')
             editconf(mpirun, input_gro=str(i)+'.gro', output_gro='box.gro')
-            make_ndx(mpirun, index_input='box.gro') # how do i make this w/o running MD?
+            make_ndx(mpirun, scan_atoms, index_input='box.gro') # how do i make this w/o running MD?
             grompp(mpirun, mdp='em.mdp', coord='box.gro', tpr='em.tpr')
-            mdrun(mpirun, deffnm='em', plumed='plumed.dat')
+            #print(i, "grompp")
+            mdrun(mpirun, deffnm='em', plumed=False)
+            print(f'finished scan {i}')
 
-    # grep from colvar files for md_energy
+    # grep from colvar files or run gmx_energy for md_energy
+    if plumed:
+        pass
+        ## still need to script this lmao ** ##
+    else:
+        pass
 
     return
 
@@ -284,6 +290,8 @@ def setup_runs(scan_coord, md_dir='md/'):
 
         shutil.copyfile(i_pdb, i_scan_dir+str(i)+'.pdb')
         shutil.copyfile('skel/em.mdp', i_scan_dir+'em.mdp')
+        shutil.copyfile('skel/cat_pdb2gmx.txt', i_scan_dir+'cat_pdb2gmx.txt')
+        shutil.copyfile('skel/cat_make_ndx.txt', i_scan_dir+'cat_make_ndx.txt')
 
         ## ** JOSHUA REWRITE (or supplement) w/ python funcs to be more modular (vs relying on user setup) ** ##
         shutil.copyfile('skel/plumed.dat', i_scan_dir+'plumed.dat')
@@ -332,13 +340,13 @@ def grompp(mpirun, mdp, coord, tpr, index="index.ndx", topol="topol.top",
 
     commands = [mpi, "grompp", "-f", mdp, "-p",
                 topol, "-c", coord, "-o", tpr, "-n", index,
-                "-maxwarn", maxwarn]
+                "-maxwarn", str(maxwarn)]
 
     subprocess.run(commands)
     return
 
 
-def mdrun(mpirun, deffnm, plumed, np=1):
+def mdrun(mpirun, deffnm, plumed=False, plumed_file='plumed.dat', np=1):
     """
     Python wrapper for gmx mdrun -deffnm
 
@@ -346,11 +354,11 @@ def mdrun(mpirun, deffnm, plumed, np=1):
     ----------
     deffnm : str
          File names for md run
-    plumed : str
-        name of plumed file
     mpirun : bool
         Is this a multi-node run or not gmx (False) vs gmx_mpi (Default: True)
         number of processes (np)
+    plumed : bool
+        Turns plumed on/off
     np : int
         Number of processes to run mpirun on (Default 1 for non-mpi run)
     """
@@ -362,12 +370,15 @@ def mdrun(mpirun, deffnm, plumed, np=1):
     else:
         print ("mpirun only takes bool as input")
 
-    commands = [mpi, "mdrun", "-deffnm", deffnm, "-plumed", plumed]
+    if plumed:
+        commands = [mpi, "mdrun", "-deffnm", deffnm, "-plumed", plumed_file]
+    else:
+        commands = [mpi, "mdrun", "-deffnm", deffnm]
 
     subprocess.run(commands)
     return
 
-def make_ndx(mpirun, index_input, np=1):
+def make_ndx(mpirun, scan_atoms, index_input, np=1):
     """
     Python wrapper for gmx make_ndx
 
@@ -378,6 +389,8 @@ def make_ndx(mpirun, index_input, np=1):
     mpirun : bool
         Is this a multi-node run or not gmx (False) vs gmx_mpi (Default: True)
         number of processes (np)
+    scan_coordinates : array of ints
+        Indicates atoms involved in scan. Need this for running MD
     np : int
         Number of processes to run mpirun on (Default 1 for non-mpi run)
     """
@@ -390,9 +403,23 @@ def make_ndx(mpirun, index_input, np=1):
         print ("mpirun only takes bool as input")
 
     commands = [mpi, "make_ndx", "-f", index_input]
+    pipe_command=["cat","cat_make_ndx.txt"] # pick ff in working directory and TIP3P ** this should not be hardcoded lmao FIX **
+    ps = subprocess.Popen(pipe_command, stdout=subprocess.PIPE)
+    output = subprocess.check_output(commands, stdin=ps.stdout)
     subprocess.run(commands)
-    #pipesub.run(commands, "q") # "q" == "quit"
+
+    # append scan atoms to end of file
+    if len(scan_atoms) is not 4:
+        raise Exception("Need 4 atoms to describe a dihedral")
+
+    w1 = "[ SCAN ]\n"
+    w2 = f'\t{scan_atoms[0]}\t{scan_atoms[1]}\t{scan_atoms[2]}\t{scan_atoms[3]}\n'
+    f1 = open("index.ndx", "a")  # append mode
+    f1.write(w1+w2)
+    f1.close()
+
     return
+
 
 def pdb2gmx(mpirun, input_pdb, output_gro, np=1):
     """
@@ -410,8 +437,9 @@ def pdb2gmx(mpirun, input_pdb, output_gro, np=1):
         print ("mpirun only takes bool as input")
 
     commands = [mpi, "pdb2gmx", "-f", input_pdb, "-o", output_gro]
-    #pipesub.run(commands, 1) # selects FF in current directory
-    subprocess.run(commands)
+    pipe_command=["cat","cat_pdb2gmx.txt"] # pick ff in working directory and TIP3P ** this should not be hardcoded lmao FIX **
+    ps = subprocess.Popen(pipe_command, stdout=subprocess.PIPE)
+    output = subprocess.check_output(commands, stdin=ps.stdout)
 
     return
 
@@ -432,7 +460,7 @@ def editconf(mpirun, input_gro, output_gro, distance=1.3, np=1):
     else:
         print ("mpirun only takes bool as input")
 
-    commands = [mpi, "editconf", "-f", input_gro, "-o", output_gro, '-c', '-d', distance]
+    commands = [mpi, "editconf", "-f", input_gro, "-o", output_gro, '-c', '-d', str(distance)]
     subprocess.run(commands) # selects FF in current directory
 
     return
