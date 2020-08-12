@@ -44,9 +44,7 @@ def read_log_into_lists(logfile, post_hartree_fock, no_energy):
     Paramters
     ---------
     post_hartree_fock : str
-        *ADD DESCRIPTION*
-	String of post-HF level
-        *ADD DESCRIPTION*
+	       String of post-HF level
     logfile : str
 	   String with  full name of log file including extension
     no_energy : bool
@@ -108,19 +106,21 @@ def read_log_into_lists(logfile, post_hartree_fock, no_energy):
 
 
 def determine_and_save_frames(scan, full, step_num):
-    """Determine which frames to write to file. Save all frames, even if it is a scan calculation.
+    """
+    Determine which frames to write to file. Save all frames, even if it is
+    a scan calculation.
+
     Parameters
     ----------
     scan : bool
-	boolean on scan calculation (Default = True)
+	   boolean on scan calculation (Default = True)
     full : bool
-	boolean on saving all frames (Defuault = True)
+	   boolean on saving all frames (Defuault = True)
     step_num : list of lists
-
+        *description?*
     Returns
     -------
     save_frames : list
-
 
     """
     #Determine which frames to write to file.
@@ -148,14 +148,15 @@ def determine_and_save_frames(scan, full, step_num):
                 pass
             else:
                 raise Exception("Calculation is likely a scan. Recheck "
-                                "arguments.\nIf so, add -s (or --scan) flag "
-                                "to function call.")
+                                "arguments.\nIf so, use scan== True")
         save_frames = range(len(step_num))
     return save_frames
 
 
 def write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartcoords, step_num, energy):
-    """Write to file
+    """
+    Write to file
+
     Paramters
     ---------
     outfile : str
@@ -170,7 +171,6 @@ def write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartco
     cartcoords : array
     step_num : list of lists
     energy : array
-
 
     """
     element_dict = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N',
@@ -226,7 +226,9 @@ def write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartco
 
 
 def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_num, energy):
-    """Write to multiple files
+    """
+    Write to multiple files
+
     Paramters
     ---------
     outfile : str
@@ -241,7 +243,6 @@ def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_nu
        list of lists containing current and max iterations
     energy : array
         energy of each frame
-
 
     """
     element_dict = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N',
@@ -263,3 +264,32 @@ def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_nu
                            .format(element, *line[1:]))
 
     return
+
+def get_scan_coord(logfile, scan_atoms, scan_dihedral=True):
+    """
+    Gets values for scan
+
+    logfile: str
+        string with  full name of log file including extension
+    scan_atoms : list
+        list of atoms used for scan
+    scan_dihedral : bool
+        indicates if a dihedral scan was performed (Default: True)
+
+    """
+    if not scan_dihedral:
+        raise Exception("Currently only handles scans for dihedral (scan_dihedral must = True)")
+    if len(scan_atoms) is not 4:
+        raise Exception("Need 4 atoms to describe a dihedral")
+
+    pattern=f'D({scan_atoms[0]},{scan_atoms[1]},{scan_atoms[2]},{scan_atoms[3]})'
+
+    scan_coord = []
+
+    with open(logfile, 'r') as logf:
+        for line in logf:
+            if pattern in line:
+                if 'Scan' not in line:
+                    scan_coord.append(line.split()[3])
+
+    return scan_coord
