@@ -247,55 +247,19 @@ def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_nu
     element_dict = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N',
                     8: 'O', 9: 'F', 10: 'Ne', 11: 'Na', 16: 'S'}
 
-
     for i, f in enumerate(save_frames):
         #Append a number to outfile to note which frame
         single_frame_file = outfile + str(i) + '.xyz'
         with open(single_frame_file, 'w') as outf:
-            outf.write('{}\n'.format(len(cartcoords[f])))
-            if no_energy:
-                outf.write('i = {0:3d}\n'.format(step_num[f][-2]))
-            else:
-                outf.write('i = {0:3d}, E = {1: >17.12f}\n'
-                           .format(step_num[f][-2], energy[f]))
+            #outf.write('{}\n'.format(len(cartcoords[f])))
+            #if no_energy:
+            #    outf.write('i = {0:3d}\n'.format(step_num[f][-2]))
+            #else:
+            #    outf.write('i = {0:3d}, E = {1: >17.12f}\n'
+            #               .format(step_num[f][-2], energy[f]))
             for line in cartcoords[f]:
                 element = element_dict[int(line[0])]
                 outf.write(' {0:s}\t\t\t{1: 2.5f}  {2: 2.5f}  {3: 2.5f}\n'\
                            .format(element, *line[1:]))
 
     return
-
-
-def parse_logfile(logfile, outfile, post_hartree_fock="", multiple_files=True, full=False,
-                  no_energy=False, last_frame=False, overwrite=True, scan=True):
-    """Parsing the logfile, wrapper function.
-    Parameters
-    ----------
-    logfile : string
-        string with  full name of log file including extension
-    outfile : str
-        str that contains name of outfile without extension
-    post_hartree_fock : str
-        post-HF level used (example='MP2' or 'MP3' else leave blank)
-    multiple_files : bool
-        option to write coordinates to seperate files or single file (Default = True; writes each scan coordinate to separate file)
-    full : bool
-        denotes saving all frames (True) or optimized frames (False) (Defuault = False)
-    no_energy : bool
-        Enabling turns off recording of energy (Default = False)
-    last_frame: bool
-        denotes whether to save only the last frame (Default = False)
-    overwrite : bool
-        denotes whether or not output file overwrites previous file of same name (Default = True)
-    scan : bool
-        boolean on scan calculation (Default = True)
-    """
-    check_post_hartree_fock(post_hartree_fock)
-
-    cartcoords, step_num, energy = read_log_into_lists(logfile, post_hartree_fock, no_energy)
-    save_frames = determine_and_save_frames(scan, full, step_num)
-    #print(step_num, len(step_num), save_frames, len(save_frames)
-    if multiple_files:
-        write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_num, energy)
-    else:
-        write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartcoords, step_num, energy)
