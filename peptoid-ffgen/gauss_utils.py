@@ -19,10 +19,12 @@ def fortrandouble(x):
 def check_post_hartree_fock(post_hartree_fock):
     """Check if post-HF method is being used and which one.
 
+    **SA - SHOULD THIS BE UPDATED? in case B3LYP is used? **
+
     Parameters
     ----------
     post_hartree_fock : str
-        String of post-HF level
+        String containing post-HF level (MP2 or MP3) else leave blank
 
     Returns
     -------
@@ -33,12 +35,12 @@ def check_post_hartree_fock(post_hartree_fock):
     if post_hartree_fock:
         assert post_hartree_fock in post_HF_options.keys(), \
             "{} not available. ".format(post_hartree_fock) +\
-            "Must choose from: {}".format(post_HF_options.keys())
+            "Must choose from: {} or leave blank".format(post_HF_options.keys())
         return True
     else:
         return False
 
-def read_log_into_lists(logfile, post_hartree_fock, no_energy):
+def read_log_into_lists(logfile, post_hartree_fock, no_energy=False):
     """Read the log file into lists.
 
     Paramters
@@ -53,11 +55,11 @@ def read_log_into_lists(logfile, post_hartree_fock, no_energy):
     Returns
     -------
     cartcoords : array
-        array with modifictions (1st and 3rd columns deleted from coordinates).
+        cartesian coordinates (x,y,z)
     step_num : list of lists
-        *ADD DESCRIPTION*
+        **ADD DESCRIPTION**
     energy : list of lists
-        *ADD DESCRIPTION*
+        **ADD DESCRIPTION**
     """
     post_HF_options = {'MP2': 'EUMP2', 'MP3': 'EUMP3'}
     cartcoords = []
@@ -105,19 +107,21 @@ def read_log_into_lists(logfile, post_hartree_fock, no_energy):
     return cartcoords, step_num, energy
 
 
-def determine_and_save_frames(scan, full, step_num):
+def determine_and_save_frames(step_num, full=False, scan=True):
     """
-    Determine which frames to write to file. Save all frames, even if it is
-    a scan calculation.
+    Determine which frames to write to file
+
+    ** SA - this function isn't called right now **
 
     Parameters
     ----------
     scan : bool
-	   boolean on scan calculation (Default = True)
+	   log file corresponds to scan (Default: True)
     full : bool
-	   boolean on saving all frames (Defuault = True)
+	   option to save all frames (including non-optimized steps) (True) or to
+       only save optimized coordinates (False) (Default: False)
     step_num : list of lists
-        *description?*
+        ** ADD DESCRIPTION **
     Returns
     -------
     save_frames : list
@@ -153,24 +157,28 @@ def determine_and_save_frames(scan, full, step_num):
     return save_frames
 
 
-def write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartcoords, step_num, energy):
+def write_to_file(cartcoords, step_num, energy, save_frames, outfile="", overwrite=True, last_frame=False, no_energy=False):
     """
     Write to file
 
     Paramters
     ---------
+    cartcoords : array
+        cartesian coordinates (x,y,z)
+    step_num : list of lists
+        ** ADD DESCRIPTION **
+    energy : array
+        ** ADD DESCRIPTION **
+    save_frames : list
+        ** ADD DESCRIPTION **
     outfile : str
-	str that contains name of file without extension
+	   str that contains name of outputfile without extension (Default: "" no extension)
     overwrite : bool
         denotes whether or not output file overwrites previous file of same name (Default = True)
     last_frame: bool
         denotes whether to save only the last frame (Default = False)
     no_energy : bool
         Enabling turns off recording of energy (Default = False)
-    save_frames : list
-    cartcoords : array
-    step_num : list of lists
-    energy : array
 
     """
     element_dict = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N',
@@ -225,7 +233,7 @@ def write_to_file(outfile, overwrite, last_frame, save_frames, no_energy, cartco
     return
 
 
-def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_num, energy):
+def write_to_multiple_files(outfile, save_frames, cartcoords, step_num, energy, no_energy=False):
     """
     Write to multiple files
 
@@ -235,6 +243,7 @@ def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_nu
 	   str that contains name of file without extension
     no_energy : bool
         Enabling turns off recording of energy (Default = False)
+        ** SA - DO WE NEED THIS? **
     save_frames : list
         list of frame indices
     cartcoords : array
@@ -247,11 +256,13 @@ def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_nu
     """
     element_dict = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N',
                     8: 'O', 9: 'F', 10: 'Ne', 11: 'Na', 16: 'S'}
+    scan_energy = []
 
     for i, f in enumerate(save_frames):
         #Append a number to outfile to note which frame
         single_frame_file = outfile + str(i) + '.xyz'
         with open(single_frame_file, 'w') as outf:
+            scan_energy.append(energy[f])
             #outf.write('{}\n'.format(len(cartcoords[f])))
             #if no_energy:
             #    outf.write('i = {0:3d}\n'.format(step_num[f][-2]))
@@ -263,7 +274,7 @@ def write_to_multiple_files(outfile, save_frames, no_energy, cartcoords, step_nu
                 outf.write(' {0:s}\t\t\t{1: 2.5f}  {2: 2.5f}  {3: 2.5f}\n'\
                            .format(element, *line[1:]))
 
-    return
+    return scan_energy
 
 def get_scan_coord(logfile, scan_atoms, scan_dihedral=True):
     """
@@ -290,6 +301,6 @@ def get_scan_coord(logfile, scan_atoms, scan_dihedral=True):
         for line in logf:
             if pattern in line:
                 if 'Scan' not in line:
-                    scan_coord.append(line.split()[3])
+                    scan_coord.append(float(line.split()[3]))
 
     return scan_coord

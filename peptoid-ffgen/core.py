@@ -6,9 +6,9 @@ import utils as u
 ##### Main Functions #####
 
 # Parse through Gaussian log file
-def parse_logfile(logfile, output_dir, post_hartree_fock="", scan_atoms,
-                  scan_dihedral=True, multiple_files=True, full=False,
-                  no_energy=False, last_frame=False, overwrite=True, scan=True):
+def parse_logfile(logfile, output_dir, scan_atoms, post_hartree_fock="",
+                  scan_dihedral=True, multiple_files=True, full=False, scan=True,
+                  outfile="", overwrite=True, last_frame=False, no_energy=False):
     """Parsing the logfile, wrapper function.
     Parameters
     ----------
@@ -27,7 +27,7 @@ def parse_logfile(logfile, output_dir, post_hartree_fock="", scan_atoms,
         (Default = True; writes each scan coordinate to separate file)
     full : bool
         denotes saving all frames (True) or optimized frames (False)
-        (Defuault = False)
+        (Default = False)
     no_energy : bool
         Enabling turns off recording of energy (Default = False)
     last_frame: bool
@@ -49,22 +49,20 @@ def parse_logfile(logfile, output_dir, post_hartree_fock="", scan_atoms,
 
     gu.check_post_hartree_fock(post_hartree_fock)
 
-    cartcoords, step_num, energy = gu.read_log_into_lists(logfile,
-                                                          post_hartree_fock,
-                                                          no_energy)
+    cartcoords, step_num, energy = gu.read_log_into_lists(logfile, post_hartree_fock, no_energy)
 
-    save_frames = gu.determine_and_save_frames(scan, full, step_num)
+    save_frames = gu.determine_and_save_frames(step_num, full, scan)
 
     if multiple_files:
-        gu.write_to_multiple_files(output_dir, save_frames, no_energy,
+        scan_energy = gu.write_to_multiple_files(output_dir+outfile, save_frames,
                                    cartcoords, step_num, energy)
     else:
-        gu.write_to_file(output_dir, overwrite, last_frame, save_frames,
-                         no_energy, cartcoords, step_num, energy)
+        gu.write_to_file(output_dir+outfile, overwrite, last_frame, save_frames,
+                         cartcoords, step_num, energy)
 
     scan_coord = gu.get_scan_coord(logfile, scan_atoms)
 
-    return scan_coord, energy # need this
+    return scan_coord, scan_energy # need this
 
 ### Convert Gaussian xyz to Gromacs pdb ###
 

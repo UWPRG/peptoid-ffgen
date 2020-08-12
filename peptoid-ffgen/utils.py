@@ -46,37 +46,40 @@ def coterminal_rev(cv_deg):
     return cv_new
 
 
-def xyz_to_scan(log2xyz_outfile, coord):
+def scan_to_dataframe(scan_coord, scan_energy, min_to_zero=True):
     """
-    Pulls energies from output of log2xyz (v1) and saves to data frame
-    with different energy units
-    *** Probably will be rewritten for updated code ***
+    Saves output of parse_logfile to dataframe structure with new units
 
     Inputs
+    --------
     log2xyz_outfile : txt file
         Output of log2xyz function
     coord : array
         Array describing scan coordinates (not printed out from log2xyz)
+    min_to_zero : bool
+        Will normalize energy units by minimum energy in scan
+
+    Returns
+    --------
+    scan_df : pandas dataframe
+        dataframe containing energy and scan coordinates in different forms
     """
     ht_to_kcal = 627.509
     ht_to_kj = 2625.50
 
-    with open(log2xyz_outfile) as f:
-        f_lines = []
-        scan_E = []
-        for ln in f:
-            if ln.startswith("i"):
-                scan_E.append(float(ln.split()[5]))
+    if min_to_zero:
+        scan_energy = scan_energy-np.min(scan_energy)
+    else:
+        raise Exception("Proceed with caution, energies are not normalized")
 
-    print(type(scan_E))
-    scan = pd.DataFrame(scan_E, columns=['hartree'])
-    convert_to_360 = coterminal(coord)
-    scan['coord'] = convert_to_360
-    scan['coord_rev'] = coterminal_rev(convert_to_360)
-    scan['kj'] = scan['hartree']*ht_to_kj
-    scan['kcal'] = scan['hartree']*ht_to_kcal
+    scan_df = pd.DataFrame(scan_energy, columns=['hartree'])
+    convert_to_360 = u.coterminal(scan_coord)
+    scan_df['coord'] = convert_to_360
+    scan_df['coord_rev'] = u.coterminal_rev(convert_to_360)
+    scan_df['kj'] = scan_df['hartree']*ht_to_kj
+    scan_df['kcal'] = scan_df['hartree']*ht_to_kcal
 
-    return scan
+    return scan_df
 
 def check_path_exists(file):
     directory = file.split(sep='/')[0] # only works on first dir in path
