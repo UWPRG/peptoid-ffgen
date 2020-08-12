@@ -1,7 +1,7 @@
 import fileinput
 import os
 import pandas as pd
-import pipesubprocess as pipesub
+import subprocess
 import shutil
 from gauss_utils import *
 from utils import *
@@ -153,51 +153,52 @@ def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index,
 
     # iterate over each row in skel file
     for i, row in df_skel.iterrows():
-        value = [row['atom_name'], row['residue_name']]
+        value = [row['atom_name'], row['residue_name']] # iterates through skel.pdb to get correct order of atoms/residues
+        #print(value)
 
         # find atom_name and residue_name that map to index using a reverse
         # hash table lookup
         for k,v in hash_table.items():
-            #print (k,v)
+            #print (v)
             if v == value:
-                #print(k)
+                print("v == value", v, value, k)
                 parser_index = k - 1
 
-        # write to PDB (requires perfect formatting) --------------------
-        # PDBs have specific formatting and alignment rules
-        # These PDBs are the bareminimum format to be read by gromacs, be aware
-        # of potential issues for PDB formatting refer to :
-        # https://www.cgl.ucsf.edu/chimera/docs/UsersGuide/tutorials/pdbintro.html
+                # write to PDB (requires perfect formatting) --------------------
+                # PDBs have specific formatting and alignment rules
+                # These PDBs are the bareminimum format to be read by gromacs, be aware
+                # of potential issues for PDB formatting refer to :
+                # https://www.cgl.ucsf.edu/chimera/docs/UsersGuide/tutorials/pdbintro.html
 
-        spacer = " "
+                spacer = " "
 
-        # for ease in writing out print statement...
-        f_a = df_skel['atom'][i]
-        f_a_num = df_skel['atom_number'][i]
-        f_a_name = df_skel['atom_name'][i]
-        f_res_name = df_skel['residue_name'][i]
-        f_chainid = 1*spacer # *Use spacer for chainID column for now*
-        f_res_num = df_skel['residue_number'][i]
-        f_x = df_xyz['x'][parser_index] # new coord
-        f_y = df_xyz['y'][parser_index] # new coord
-        f_z = df_xyz['z'][parser_index] # new coord
-        f_occ = df_skel['occupancy'][i]
-        f_mass = df_skel['mass'][i]
+                # for ease in writing out print statement...
+                f_a = df_skel['atom'][i]
+                f_a_num = df_skel['atom_number'][i]
+                f_a_name = df_skel['atom_name'][i]
+                f_res_name = df_skel['residue_name'][i]
+                f_chainid = 1*spacer # *Use spacer for chainID column for now*
+                f_res_num = df_skel['residue_number'][i]
+                f_x = df_xyz['x'][parser_index] # new coord
+                f_y = df_xyz['y'][parser_index] # new coord
+                f_z = df_xyz['z'][parser_index] # new coord
+                f_occ = df_skel['occupancy'][i]
+                f_mass = df_skel['mass'][i]
 
-        # hard coded spacers -------------
-        # spacers are hard-coded if they represent a space in the PDB file
-        s1=2*spacer # b/w ATOM -> atom serial num
-        # b/w atom serial num and atom name
-        if len(f_a_name) == 4:
-            s2=1*spacer
-        else:
-            s2=2*spacer
-        s3=1*spacer # alternate location indicator
-        s4=1*spacer # b/w residue name and chain identifier
-        s5=1*spacer # insertion of residues
-        s6=3*spacer # between insertion and x coordinate
+                # hard coded spacers -------------
+                # spacers are hard-coded if they represent a space in the PDB file
+                s1=2*spacer # b/w ATOM -> atom serial num
+                # b/w atom serial num and atom name
+                if len(f_a_name) == 4:
+                    s2=1*spacer
+                else:
+                    s2=2*spacer
+                s3=1*spacer # alternate location indicator
+                s4=1*spacer # b/w residue name and chain identifier
+                s5=1*spacer # insertion of residues
+                s6=3*spacer # between insertion and x coordinate
 
-        write_string+=(f"{f_a}{s1}{f_a_num:>5}{s2}{f_a_name:>3}{s3}{f_res_name:>3}{s4}{f_chainid}{f_res_num:>4}{s5}{s6}{f_x:8.3f}{f_y:8.3f}{f_z:8.3f}{f_occ:6.2f}{f_mass:6.2f}\n")
+                write_string+=(f"{f_a}{s1}{f_a_num:>5}{s2}{f_a_name:>3}{s3}{f_res_name:>3}{s4}{f_chainid}{f_res_num:>4}{s5}{s6}{f_x:8.3f}{f_y:8.3f}{f_z:8.3f}{f_occ:6.2f}{f_mass:6.2f}\n")
 
     with open(skel_file) as r:
         h_lines = r.readlines()[0:4]
@@ -287,7 +288,7 @@ def setup_runs(scan_coord, md_dir='md/'):
         ## ** JOSHUA REWRITE (or supplement) w/ python funcs to be more modular (vs relying on user setup) ** ##
         shutil.copyfile('skel/plumed.dat', i_scan_dir+'plumed.dat')
         plumed_find = 'XXX'
-        with fileinput.FileInput(i_scan_dir+'plumed.dat', inplace=True, backup='.bak') as f_plumed:
+    with fileinput.FileInput(i_scan_dir+'plumed.dat', inplace=True) as f_plumed:
             for line in f_plumed:
                 print(line.replace(plumed_find, str(scan_coord[i])))
         ## ** end rewrite section ** ##
@@ -409,7 +410,8 @@ def pdb2gmx(mpirun, input_pdb, output_gro, np=1):
         print ("mpirun only takes bool as input")
 
     commands = [mpi, "pdb2gmx", "-f", input_pdb, "-o", output_gro]
-    pipesub.run(commands, 1) # selects FF in current directory
+    #pipesub.run(commands, 1) # selects FF in current directory
+    subprocess.run(commands)
 
     return
 
