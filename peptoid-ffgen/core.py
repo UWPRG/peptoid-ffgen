@@ -6,7 +6,8 @@ import utils as u
 ##### Main Functions #####
 
 # Parse through Gaussian log file
-def parse_logfile(logfile, output_dir, post_hartree_fock="", multiple_files=True, full=False,
+def parse_logfile(logfile, output_dir, post_hartree_fock="", scan_atoms,
+                  scan_dihedral=True, multiple_files=True, full=False,
                   no_energy=False, last_frame=False, overwrite=True, scan=True):
     """Parsing the logfile, wrapper function.
     Parameters
@@ -17,38 +18,61 @@ def parse_logfile(logfile, output_dir, post_hartree_fock="", multiple_files=True
         str that contains name of output directory
     post_hartree_fock : str
         post-HF level used (example='MP2' or 'MP3' else leave blank)
+    scan_atoms : list
+        list of atoms used for scan
+    scan_dihedral : bool
+        indicates if a dihedral scan was performed (Default: True)
     multiple_files : bool
-        option to write coordinates to seperate files or single file (Default = True; writes each scan coordinate to separate file)
+        option to write coordinates to seperate files or single file
+        (Default = True; writes each scan coordinate to separate file)
     full : bool
-        denotes saving all frames (True) or optimized frames (False) (Defuault = False)
+        denotes saving all frames (True) or optimized frames (False)
+        (Defuault = False)
     no_energy : bool
         Enabling turns off recording of energy (Default = False)
     last_frame: bool
         denotes whether to save only the last frame (Default = False)
     overwrite : bool
-        denotes whether or not output file overwrites previous file of same name (Default = True)
+        denotes whether or not output file overwrites previous file of same
+        name (Default = True)
     scan : bool
-        boolean on scan calculation (Default = True)
+        Is log file for a scan calculation (Default = True)
+
+    Returns
+    ---------
+    scan_coord : list
+        list of scan coordinates
+    energy : list
+        qm energy from run (in Hartree)
     """
     u.check_path_exists(output_dir)
 
     gu.check_post_hartree_fock(post_hartree_fock)
 
-    cartcoords, step_num, energy = gu.read_log_into_lists(logfile, post_hartree_fock, no_energy)
-    save_frames = gu.determine_and_save_frames(scan, full, step_num)
-    if multiple_files:
-        gu.write_to_multiple_files(output_dir, save_frames, no_energy, cartcoords, step_num, energy)
-    else:
-        gu.write_to_file(output_dir, overwrite, last_frame, save_frames, no_energy, cartcoords, step_num, energy)
+    cartcoords, step_num, energy = gu.read_log_into_lists(logfile,
+                                                          post_hartree_fock,
+                                                          no_energy)
 
-    return energy # need this
+    save_frames = gu.determine_and_save_frames(scan, full, step_num)
+
+    if multiple_files:
+        gu.write_to_multiple_files(output_dir, save_frames, no_energy,
+                                   cartcoords, step_num, energy)
+    else:
+        gu.write_to_file(output_dir, overwrite, last_frame, save_frames,
+                         no_energy, cartcoords, step_num, energy)
+
+    scan_coord = gu.get_scan_coord(logfile, scan_atoms)
+
+    return scan_coord, energy # need this
 
 ### Convert Gaussian xyz to Gromacs pdb ###
 
 def parse_xyz(xyz_dir, hash_table, skel_file, output_dir, file_index=1,
             file_type='pdb', multiple_files=True):
     """
-    a wrapper for gen_pdb to be run on multiple xyz files that are all located in the same dir
+    A wrapper for gen_pdb to be run on multiple xyz files that are all located
+    in the same dir
 
     Inputs
     xyz_dir : str
@@ -192,7 +216,7 @@ def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index,
 
 ### Functions for running MD on GROMACS ###
 
-def launch_md(engine="GROMACS"):
+def run_md(engine="GROMACS"):
     # recode wrapper script here
 
     # symbolic link charmm directory
