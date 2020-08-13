@@ -4,6 +4,7 @@ import pandas as pd
 import subprocess
 import shutil
 from gauss_utils import *
+
 from utils import *
 
 ##### Main Functions #####
@@ -235,6 +236,7 @@ def run_md(scan_coord, scan_atoms, mpirun, plumed, md_dir='md/'):
     md_dir : str
         directory name where md will run and be stored
     """
+    md_energy = []
 
     # setup MD
     setup_runs(scan_coord)
@@ -262,13 +264,20 @@ def run_md(scan_coord, scan_atoms, mpirun, plumed, md_dir='md/'):
             print(f'finished scan {i}')
 
     # grep from colvar files or run gmx_energy for md_energy
-    if plumed:
-        pass
-        ## still need to script this lmao ** ##
-    else:
-        pass
+            if plumed:
+                pass
+                ## still need to script this lmao ** ##
+                ## basically run plumed driver and extract energy corresponding to scan CV
+            else:
+                energy(mpirun, input_f='em.edr', output_xvg='potential.xvg')
+                with open('potential.xvg') as f:
+                    for line in f:
+                        pass
+                    last_line = line
+                    #print(last_line.split())
+                    md_energy.append(float(last_line.split()[1]))
 
-    return
+    return md_energy
 
 
 def setup_runs(scan_coord, md_dir='md/'):
@@ -292,6 +301,7 @@ def setup_runs(scan_coord, md_dir='md/'):
         shutil.copyfile('skel/em.mdp', i_scan_dir+'em.mdp')
         shutil.copyfile('skel/cat_pdb2gmx.txt', i_scan_dir+'cat_pdb2gmx.txt')
         shutil.copyfile('skel/cat_make_ndx.txt', i_scan_dir+'cat_make_ndx.txt')
+        shutil.copyfile('skel/cat_energy.txt', i_scan_dir+'cat_energy.txt')
 
         ## ** JOSHUA REWRITE (or supplement) w/ python funcs to be more modular (vs relying on user setup) ** ##
         shutil.copyfile('skel/plumed.dat', i_scan_dir+'plumed.dat')
@@ -302,165 +312,57 @@ def setup_runs(scan_coord, md_dir='md/'):
         ## ** end rewrite section ** ##
     return
 
-def grompp(mpirun, mdp, coord, tpr, index="index.ndx", topol="topol.top",
-           maxwarn=1, np=1):
+## Functions for calculating error ##
+def calc_error(d1, d2,rss_method):
     """
-    Python wrapper for gmx grompp
+    Calculates root mean square error between two data arrays
 
     Parameters
     ----------
-    mpirun : Bool
-        Is this a multi-node run or not (gmx vs gmx_mpi), if True must specify
-        number of processes (np)
-    mdp : str
-        Filename of .mdp file
-    coord : str
-        Filename of .gro or .pdb file
-    tpr : str
-        Filename of output of grompp
-    index : str
-        Filename of index file (Default index.ndx)
-    topol : str
-        Filename of topology file (Default topol.top)
-    maxwarn : int
-        Maximum number of acceptable warnings when grompping
-    mpirun : bool
-        Is this a multi-node run or not gmx (False) vs gmx_mpi (Default: True)
-        number of processes (np)
-    np : int
-        Number of processes to run mpirun on (Default 1 for non-mpi run)
+    d1 : pandas dataframe column
+        list of energies
+    d2 : pandas dataframe column
+        list of energies
+    rss_method: string
+        Can evaluate error in 3 ways:
+        'min_to_zero' : sets min energy from d1 and d2 to zero
+        'average_energy' : normalizes energies to average energy
+        'KLDIV' : takes into account a weighted average
     """
+    if rss_method == 'min_to_zero':
+        d1 = d1 - d1.min()
+        d2 = d2 - d2.min()
 
-    if mpirun == True:
-        mpi = "mpirun " + "np " + str(np) + "gmx_mpi"
-    elif mpirun == False:
-        mpi = "gmx"
+         # error metric
+        rmse = np.sqrt(((d1 - d2)**2).mean())
+
+    elif rss_method == 'average_energy':
+        # get on same scale
+        d1 = d1 - d1.min()
+        d2 = d2 - d2.min()
+
+        # normalize by average energy - I think I'm doing this wrong check w Jim
+        d1 = np.mean(d1)
+        d2 = np.mean(d2)
+
+        # error metric
+        rmse = np.sqrt(((d1 - d2)**2).mean())
+
+    elif rss_method == 'KLDIV': # Kullback Liebler divergence
+        # get on same scale
+        d1 = d1 - d1.min()
+        d2 = d2 - d2.min()
+
+        # calculate weight
+        kb = 0.008314463 # kJ/mol
+        T = 300 # Kelvin
+        beta = 1/(kb*T) # 2.49 kj/mol K at 300K
+        weight = np.exp(-beta*d1)
+
+        # error metric
+        rmse = np.sqrt((((d1 - d2)*weight)**2).mean())
+
     else:
-        print ("mpirun only takes bool as input")
+        print (f"choose from ['min_to_zero', 'average_energy', or 'KLDIV']")
 
-    commands = [mpi, "grompp", "-f", mdp, "-p",
-                topol, "-c", coord, "-o", tpr, "-n", index,
-                "-maxwarn", str(maxwarn)]
-
-    subprocess.run(commands)
-    return
-
-
-def mdrun(mpirun, deffnm, plumed=False, plumed_file='plumed.dat', np=1):
-    """
-    Python wrapper for gmx mdrun -deffnm
-
-    Parameters
-    ----------
-    deffnm : str
-         File names for md run
-    mpirun : bool
-        Is this a multi-node run or not gmx (False) vs gmx_mpi (Default: True)
-        number of processes (np)
-    plumed : bool
-        Turns plumed on/off
-    np : int
-        Number of processes to run mpirun on (Default 1 for non-mpi run)
-    """
-
-    if mpirun == True:
-        mpi = "mpirun " + "np " + str(np) + " gmx_mpi"
-    elif mpirun == False:
-        mpi = "gmx"
-    else:
-        print ("mpirun only takes bool as input")
-
-    if plumed:
-        commands = [mpi, "mdrun", "-deffnm", deffnm, "-plumed", plumed_file]
-    else:
-        commands = [mpi, "mdrun", "-deffnm", deffnm]
-
-    subprocess.run(commands)
-    return
-
-def make_ndx(mpirun, scan_atoms, index_input, np=1):
-    """
-    Python wrapper for gmx make_ndx
-
-    Parameters
-    ----------
-    index_input : str
-        file (with extension) used for gmx make_ndx
-    mpirun : bool
-        Is this a multi-node run or not gmx (False) vs gmx_mpi (Default: True)
-        number of processes (np)
-    scan_coordinates : array of ints
-        Indicates atoms involved in scan. Need this for running MD
-    np : int
-        Number of processes to run mpirun on (Default 1 for non-mpi run)
-    """
-
-    if mpirun == True:
-        mpi = "mpirun " + "np " + str(np) + " gmx_mpi"
-    elif mpirun == False:
-        mpi = "gmx"
-    else:
-        print ("mpirun only takes bool as input")
-
-    commands = [mpi, "make_ndx", "-f", index_input]
-    pipe_command=["cat","cat_make_ndx.txt"] # pick ff in working directory and TIP3P ** this should not be hardcoded lmao FIX **
-    ps = subprocess.Popen(pipe_command, stdout=subprocess.PIPE)
-    output = subprocess.check_output(commands, stdin=ps.stdout)
-    subprocess.run(commands)
-
-    # append scan atoms to end of file
-    if len(scan_atoms) is not 4:
-        raise Exception("Need 4 atoms to describe a dihedral")
-
-    w1 = "[ SCAN ]\n"
-    w2 = f'\t{scan_atoms[0]}\t{scan_atoms[1]}\t{scan_atoms[2]}\t{scan_atoms[3]}\n'
-    f1 = open("index.ndx", "a")  # append mode
-    f1.write(w1+w2)
-    f1.close()
-
-    return
-
-
-def pdb2gmx(mpirun, input_pdb, output_gro, np=1):
-    """
-    Python wrapper for gmx pdb2gmx
-
-    Parameters
-    ----------
-    """
-
-    if mpirun == True:
-        mpi = "mpirun " + "np " + str(np) + " gmx_mpi"
-    elif mpirun == False:
-        mpi = "gmx"
-    else:
-        print ("mpirun only takes bool as input")
-
-    commands = [mpi, "pdb2gmx", "-f", input_pdb, "-o", output_gro]
-    pipe_command=["cat","cat_pdb2gmx.txt"] # pick ff in working directory and TIP3P ** this should not be hardcoded lmao FIX **
-    ps = subprocess.Popen(pipe_command, stdout=subprocess.PIPE)
-    output = subprocess.check_output(commands, stdin=ps.stdout)
-
-    return
-
-def editconf(mpirun, input_gro, output_gro, distance=1.3, np=1):
-    """
-    Python wrapper for gmx editconf
-
-    Parameters
-    ----------
-    distance : int
-        distance between solute and box (default 1.3)
-    """
-
-    if mpirun == True:
-        mpi = "mpirun " + "np " + str(np) + " gmx_mpi"
-    elif mpirun == False:
-        mpi = "gmx"
-    else:
-        print ("mpirun only takes bool as input")
-
-    commands = [mpi, "editconf", "-f", input_gro, "-o", output_gro, '-c', '-d', str(distance)]
-    subprocess.run(commands) # selects FF in current directory
-
-    return
+    return rmse
