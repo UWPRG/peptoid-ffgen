@@ -93,6 +93,44 @@ def scan_to_dataframe(scan_coord, scan_energy, min_to_zero=True):
 
     return scan_df
 
+
+def mdscan_to_dataframe(scan_coord, md_energy, min_to_zero=True):
+    """
+    Saves output of run_md w/ Plumed = False (default kJ) to dataframe
+    structure with new units
+
+    Parameters
+    ----------
+    log2xyz_outfile : txt file
+        Output of log2xyz function
+    coord : array
+        Array describing scan coordinates (not printed out from log2xyz)
+    min_to_zero : bool
+        Will normalize energy units by minimum energy in scan
+
+    Returns
+    --------
+    md_df : pandas dataframe
+        dataframe containing energy and scan coordinates in different forms
+    """
+    ht_to_kcal = 627.509
+    ht_to_kj = 2625.50
+    kj_to_kcal = 1/4.184
+
+    if min_to_zero:
+        md_energy = md_energy-np.min(md_energy)
+    else:
+        print("Proceed with caution, energies are not normalized to any value")
+
+    md_df = pd.DataFrame(md_energy, columns=['kj'])
+    convert_to_360 = coterminal(scan_coord)
+    md_df['coord'] = convert_to_360
+    md_df['coord_rev'] = coterminal_rev(convert_to_360)
+    md_df['hartree'] = md_df['kj']/ht_to_kj
+    md_df['kcal'] = md_df['kj']*kj_to_kcal
+
+    return md_df
+
 def check_path_exists(file):
     """
     Creates directory of path to dir doesnt exist (Uses a "/" delimiter so only
