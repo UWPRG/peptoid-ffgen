@@ -1,13 +1,18 @@
+import fileinput
 import os
 import pandas as pd
-import gauss_utils as gu
-import utils as u
+import subprocess
+import shutil
+from gauss_utils import *
+
+from utils import *
 
 ##### Main Functions #####
 
 # Parse through Gaussian log file
-def parse_logfile(logfile, output_dir, post_hartree_fock="", multiple_files=True, full=False,
-                  no_energy=False, last_frame=False, overwrite=True, scan=True):
+def parse_logfile(logfile, output_dir, scan_atoms, post_hartree_fock="",
+                  scan_dihedral=True, multiple_files=True, full=False, scan=True,
+                  outfile="", overwrite=True, last_frame=False, no_energy=False):
     """Parsing the logfile, wrapper function.
     Parameters
     ----------
@@ -17,40 +22,63 @@ def parse_logfile(logfile, output_dir, post_hartree_fock="", multiple_files=True
         str that contains name of output directory
     post_hartree_fock : str
         post-HF level used (example='MP2' or 'MP3' else leave blank)
+    scan_atoms : list
+        list of atoms used for scan
+    scan_dihedral : bool
+        indicates if a dihedral scan was performed (Default: True)
     multiple_files : bool
-        option to write coordinates to seperate files or single file (Default = True; writes each scan coordinate to separate file)
+        option to write coordinates to seperate files or single file
+        (Default = True; writes each scan coordinate to separate file)
     full : bool
-        denotes saving all frames (True) or optimized frames (False) (Defuault = False)
+        denotes saving all frames (True) or optimized frames (False)
+        (Default = False)
     no_energy : bool
         Enabling turns off recording of energy (Default = False)
     last_frame: bool
         denotes whether to save only the last frame (Default = False)
     overwrite : bool
-        denotes whether or not output file overwrites previous file of same name (Default = True)
+        denotes whether or not output file overwrites previous file of same
+        name (Default = True)
     scan : bool
-        boolean on scan calculation (Default = True)
+        Is log file for a scan calculation (Default = True)
+
+    Returns
+    ---------
+    scan_coord : list
+        list of scan coordinates
+    energy : list
+        qm energy from run (in Hartree)
     """
-    u.check_path_exists(output_dir)
+    check_path_exists(output_dir)
 
-    gu.check_post_hartree_fock(post_hartree_fock)
+    check_post_hartree_fock(post_hartree_fock)
 
-    cartcoords, step_num, energy = gu.read_log_into_lists(logfile, post_hartree_fock, no_energy)
-    save_frames = gu.determine_and_save_frames(scan, full, step_num)
+    cartcoords, step_num, energy = read_log_into_lists(logfile, post_hartree_fock, no_energy)
+
+    save_frames = determine_and_save_frames(step_num, full, scan)
+
     if multiple_files:
-        gu.write_to_multiple_files(output_dir, save_frames, no_energy, cartcoords, step_num, energy)
+        scan_energy = write_to_multiple_files(output_dir+outfile, save_frames,
+                                   cartcoords, step_num, energy)
     else:
-        gu.write_to_file(output_dir, overwrite, last_frame, save_frames, no_energy, cartcoords, step_num, energy)
+        write_to_file(output_dir+outfile, overwrite, last_frame, save_frames,
+                         cartcoords, step_num, energy)
 
-    return energy # need this
+    scan_coord = get_scan_coord(logfile, scan_atoms)
+
+    return scan_coord, scan_energy # need this
+
 
 ### Convert Gaussian xyz to Gromacs pdb ###
 
 def parse_xyz(xyz_dir, hash_table, skel_file, output_dir, file_index=1,
             file_type='pdb', multiple_files=True):
     """
-    a wrapper for gen_pdb to be run on multiple xyz files that are all located in the same dir
+    A wrapper for gen_pdb to be run on multiple xyz files that are all located
+    in the same dir
 
-    Inputs
+    Parameters
+    ----------
     xyz_dir : str
         Directory where all processed xyz files are located
     hash_table : dictionary
@@ -75,12 +103,14 @@ def parse_xyz(xyz_dir, hash_table, skel_file, output_dir, file_index=1,
         gen_pdb(xyz_file, hash_table=hash_table, skel_file=skel_file,
                 output_dir=output_dir, file_index=i, file_type='pdb')
 
+
 def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index,
             file_type='pdb'):
     """
     Reads in an xyz file and returns a formatted pdb file
 
-    Inputs
+    Parameters
+    ----------
     xyz_file : xyz coordinate file
         Output of log2xyz
     hash_table : dictionary
@@ -99,7 +129,7 @@ def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index,
         Determines type of output, only handles PDB files for now
     """
 
-    u.check_path_exists(output_dir)
+    check_path_exists(output_dir)
 
     if file_type == 'pdb':
         f_type = '.pdb'
@@ -124,51 +154,52 @@ def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index,
 
     # iterate over each row in skel file
     for i, row in df_skel.iterrows():
-        value = [row['atom_name'], row['residue_name']]
+        value = [row['atom_name'], row['residue_name']] # iterates through skel.pdb to get correct order of atoms/residues
+        #print(value)
 
         # find atom_name and residue_name that map to index using a reverse
         # hash table lookup
         for k,v in hash_table.items():
-            #print (k,v)
+            #print (v)
             if v == value:
-                #print(k)
+                #print("v == value", v, value, k)
                 parser_index = k - 1
 
-        # write to PDB (requires perfect formatting) --------------------
-        # PDBs have specific formatting and alignment rules
-        # These PDBs are the bareminimum format to be read by gromacs, be aware
-        # of potential issues for PDB formatting refer to :
-        # https://www.cgl.ucsf.edu/chimera/docs/UsersGuide/tutorials/pdbintro.html
+                # write to PDB (requires perfect formatting) --------------------
+                # PDBs have specific formatting and alignment rules
+                # These PDBs are the bareminimum format to be read by gromacs, be aware
+                # of potential issues for PDB formatting refer to :
+                # https://www.cgl.ucsf.edu/chimera/docs/UsersGuide/tutorials/pdbintro.html
 
-        spacer = " "
+                spacer = " "
 
-        # for ease in writing out print statement...
-        f_a = df_skel['atom'][i]
-        f_a_num = df_skel['atom_number'][i]
-        f_a_name = df_skel['atom_name'][i]
-        f_res_name = df_skel['residue_name'][i]
-        f_chainid = 1*spacer # *Use spacer for chainID column for now*
-        f_res_num = df_skel['residue_number'][i]
-        f_x = df_xyz['x'][parser_index] # new coord
-        f_y = df_xyz['y'][parser_index] # new coord
-        f_z = df_xyz['z'][parser_index] # new coord
-        f_occ = df_skel['occupancy'][i]
-        f_mass = df_skel['mass'][i]
+                # for ease in writing out print statement...
+                f_a = df_skel['atom'][i]
+                f_a_num = df_skel['atom_number'][i]
+                f_a_name = df_skel['atom_name'][i]
+                f_res_name = df_skel['residue_name'][i]
+                f_chainid = 1*spacer # *Use spacer for chainID column for now*
+                f_res_num = df_skel['residue_number'][i]
+                f_x = df_xyz['x'][parser_index] # new coord
+                f_y = df_xyz['y'][parser_index] # new coord
+                f_z = df_xyz['z'][parser_index] # new coord
+                f_occ = df_skel['occupancy'][i]
+                f_mass = df_skel['mass'][i]
 
-        # hard coded spacers -------------
-        # spacers are hard-coded if they represent a space in the PDB file
-        s1=2*spacer # b/w ATOM -> atom serial num
-        # b/w atom serial num and atom name
-        if len(f_a_name) == 4:
-            s2=1*spacer
-        else:
-            s2=2*spacer
-        s3=1*spacer # alternate location indicator
-        s4=1*spacer # b/w residue name and chain identifier
-        s5=1*spacer # insertion of residues
-        s6=3*spacer # between insertion and x coordinate
+                # hard coded spacers -------------
+                # spacers are hard-coded if they represent a space in the PDB file
+                s1=2*spacer # b/w ATOM -> atom serial num
+                # b/w atom serial num and atom name
+                if len(f_a_name) == 4:
+                    s2=1*spacer
+                else:
+                    s2=2*spacer
+                s3=1*spacer # alternate location indicator
+                s4=1*spacer # b/w residue name and chain identifier
+                s5=1*spacer # insertion of residues
+                s6=3*spacer # between insertion and x coordinate
 
-        write_string+=(f"{f_a}{s1}{f_a_num:>5}{s2}{f_a_name:>3}{s3}{f_res_name:>3}{s4}{f_chainid}{f_res_num:>4}{s5}{s6}{f_x:8.3f}{f_y:8.3f}{f_z:8.3f}{f_occ:6.2f}{f_mass:6.2f}\n")
+                write_string+=(f"{f_a}{s1}{f_a_num:>5}{s2}{f_a_name:>3}{s3}{f_res_name:>3}{s4}{f_chainid}{f_res_num:>4}{s5}{s6}{f_x:8.3f}{f_y:8.3f}{f_z:8.3f}{f_occ:6.2f}{f_mass:6.2f}\n")
 
     with open(skel_file) as r:
         h_lines = r.readlines()[0:4]
@@ -185,85 +216,153 @@ def gen_pdb(xyz_file, hash_table, skel_file, output_dir, file_index,
     # write to file
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    with open(output_dir+str(file_index)+"_names"+f_type, "w") as outfile:
+    with open(output_dir+str(file_index)+f_type, "w") as outfile:
         outfile.write(header+write_string+footer)
 
     return
 
+
 ### Functions for running MD on GROMACS ###
 
-def launch_md(engine="GROMACS"):
-    # recode wrapper script here
+def run_md(scan_coord, scan_atoms, mpirun, plumed, md_dir='md/'):
+    """
+    Wrapper for running energy minimization for each scan coordinate. Only runs
+    with Gromacs.
 
-    # symbolic link charmm directory
+    Parameters
+    ----------
+    scan_coord : list
+        list of scan coordinates
+    md_dir : str
+        directory name where md will run and be stored
+    """
+    md_energy = []
 
-    #
+    # setup MD
+    setup_runs(scan_coord)
 
+    # run MD
+
+    for i, s in enumerate(scan_coord):
+        top_dir = os.getcwd()+"/"
+        i_pdb = 'pdb/'+str(i)+'.pdb'
+
+        # copy forcefield
+        src = top_dir+"skel/"+"charmm36-nov2016.ff/"
+        dst = top_dir+"md/"+str(i)+"/charmm36-nov2016.ff"
+        if not os.path.exists(dst):
+            shutil.copytree(src,dst)
+
+        # cd into directory and do some md
+        with cd(top_dir+"md/"+str(i)):
+            pdb2gmx(mpirun, input_pdb=str(i)+'.pdb', output_gro=str(i)+'.gro')
+            editconf(mpirun, input_gro=str(i)+'.gro', output_gro='box.gro')
+            make_ndx(mpirun, scan_atoms, index_input='box.gro') # how do i make this w/o running MD?
+            grompp(mpirun, mdp='em.mdp', coord='box.gro', tpr='em.tpr')
+            #print(i, "grompp")
+            mdrun(mpirun, deffnm='em', plumed=False)
+            print(f'finished scan {i}')
+
+    # grep from colvar files or run gmx_energy for md_energy
+            if plumed:
+                pass
+                ## still need to script this lmao ** ##
+                ## basically run plumed driver and extract energy corresponding to scan CV
+            else:
+                energy(mpirun, input_f='em.edr', output_xvg='potential.xvg')
+                with open('potential.xvg') as f:
+                    for line in f:
+                        pass
+                    last_line = line
+                    #print(last_line.split())
+                    md_energy.append(float(last_line.split()[1]))
+
+    return md_energy
+
+
+def setup_runs(scan_coord, md_dir='md/'):
+    """
+    Generates folders for md runs based on number of scan coordinates
+
+    Parameters
+    ----------
+    scan_coord : list
+        list of scan coordinates
+    md_dir : str
+        directory name where md will run and be stored
+    """
+    for i, s in enumerate(scan_coord):
+        check_path_exists(md_dir)
+        i_scan_dir = md_dir+str(i)+"/"
+        check_path_exists(i_scan_dir)
+        i_pdb = 'pdb/'+str(i)+'.pdb'
+
+        shutil.copyfile(i_pdb, i_scan_dir+str(i)+'.pdb')
+        shutil.copyfile('skel/em.mdp', i_scan_dir+'em.mdp')
+        shutil.copyfile('skel/cat_pdb2gmx.txt', i_scan_dir+'cat_pdb2gmx.txt')
+        shutil.copyfile('skel/cat_make_ndx.txt', i_scan_dir+'cat_make_ndx.txt')
+        shutil.copyfile('skel/cat_energy.txt', i_scan_dir+'cat_energy.txt')
+
+        ## ** JOSHUA REWRITE (or supplement) w/ python funcs to be more modular (vs relying on user setup) ** ##
+        shutil.copyfile('skel/plumed.dat', i_scan_dir+'plumed.dat')
+        plumed_find = 'XXX'
+    with fileinput.FileInput(i_scan_dir+'plumed.dat', inplace=True) as f_plumed:
+            for line in f_plumed:
+                print(line.replace(plumed_find, str(scan_coord[i])))
+        ## ** end rewrite section ** ##
     return
 
-def grompp(mpirun, mdp, coord, tpr, index="index.ndx", topol="topol.top",
-           maxwarn=1, np=1, logfile="stdout.log"):
+## Functions for calculating error ##
+def calc_error(d1, d2,rss_method):
     """
-    Python wrapper for gmx grompp
+    Calculates root mean square error between two data arrays
 
-    Inputs
-    mpirun : Bool
-        Is this a multi-node run or not (gmx vs gmx_mpi), if True must specify
-        number of processes (np)
-    mdp : str
-        Filename of .mdp file
-    coord : str
-        Filename of .gro or .pdb file
-    tpr : str
-        Filename of output of grompp
-    index : str
-        Filename of index file (Default index.ndx)
-    topol : str
-        Filename of topology file (Default topol.top)
-    maxwarn : int
-        Maximum number of acceptable warnings when grompping
-    np : int
-        Number of processes to run mpirun on (Default 1 for non-mpi run)
+    Parameters
+    ----------
+    d1 : pandas dataframe column
+        list of energies
+    d2 : pandas dataframe column
+        list of energies
+    rss_method: string
+        Can evaluate error in 3 ways:
+        'min_to_zero' : sets min energy from d1 and d2 to zero
+        'average_energy' : normalizes energies to average energy
+        'KLDIV' : takes into account a weighted average
     """
+    if rss_method == 'min_to_zero':
+        d1 = d1 - d1.min()
+        d2 = d2 - d2.min()
 
-    if mpirun == True:
-        mpi = "mpirun " + "np " + np + "gmx_mpi "
-    elif mpirun == False:
-        mpi = "gmx "
+         # error metric
+        rmse = np.sqrt(((d1 - d2)**2).mean())
+
+    elif rss_method == 'average_energy':
+        # get on same scale
+        d1 = d1 - d1.min()
+        d2 = d2 - d2.min()
+
+        # normalize by average energy - I think I'm doing this wrong check w Jim
+        d1 = np.mean(d1)
+        d2 = np.mean(d2)
+
+        # error metric
+        rmse = np.sqrt(((d1 - d2)**2).mean())
+
+    elif rss_method == 'KLDIV': # Kullback Liebler divergence
+        # get on same scale
+        d1 = d1 - d1.min()
+        d2 = d2 - d2.min()
+
+        # calculate weight
+        kb = 0.008314463 # kJ/mol
+        T = 300 # Kelvin
+        beta = 1/(kb*T) # 2.49 kj/mol K at 300K
+        weight = np.exp(-beta*d1)
+
+        # error metric
+        rmse = np.sqrt((((d1 - d2)*weight)**2).mean())
+
     else:
-        print ("mpirun only takes bool as input")
+        print (f"choose from ['min_to_zero', 'average_energy', or 'KLDIV']")
 
-    commands = [mpi, "grompp", "-f", mdp, "-p",
-                topol, "-c", coord, "-o", tpr, "-n", index,
-                "-maxwarn", maxwarn]
-
-    subprocess.run(commands, stdout=logfile)
-    return
-
-def mdrun(mpirun, deffnm, plumed, np=1):
-    """
-    Python wrapper for gmx mdrun -deffnm
-
-    Inputs
-    mpirun : Bool
-        Is this a multi-node run or not (gmx vs gmx_mpi), if True must specify
-        number of processes (np)
-    deffnm : str
-         File names for md run
-    plumed : str
-        name of plumed file
-    np : int
-        Number of processes to run mpirun on (Default 1 for non-mpi run)
-    """
-
-    if mpirun == True:
-        mpi = "mpirun " + "np " + np + "gmx_mpi "
-    elif mpirun == False:
-        mpi = "gmx "
-    else:
-        print ("mpirun only takes bool as input")
-
-    commands = [mpi, "mdrun", "-deffnm", deffnm, "-plumed", plumed]
-
-    subprocess.run(commands, stdout=logfile)
-    return
+    return rmse
