@@ -260,7 +260,6 @@
            CE1   CH
            CE2   CH
            CH    BRL
-           BRL   LP
            CA    HA1
            CA    HA2
            CB    HB1
@@ -335,7 +334,6 @@
            CE1   CH
            CE2   CH
            CH    BRL
-           BRL   LP
            CA    HA1
            CA    HA2
            CB    HB1
@@ -403,7 +401,6 @@
            CE1   CH
            CE2   CH
            CH    BRL
-           BRL   LP
            CA    HA1
            CA    HA2
            CB    HB1

@@ -1,3 +1,5 @@
+import subprocess
+
 def grompp(mpirun, mdp, coord, tpr, index="index.ndx", topol="topol.top",
            maxwarn=1, np=1):
     """

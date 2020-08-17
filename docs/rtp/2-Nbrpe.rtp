@@ -451,7 +451,6 @@
            CE1   CZ1
            CZ1   CH
            CH    BRL
-           BRL   LP
            CH    CZ2
            CZ2   CE2
            CA    HA1
@@ -537,7 +536,6 @@
            CE1   CZ1
            CZ1   CH
            CH    BRL
-           BRL   LP
            CH    CZ2
            CZ2   CE2
            CA    HA1
@@ -613,7 +611,6 @@
            CE1   CZ1
            CZ1   CH
            CH    BRL
-           BRL   LP
            CH    CZ2
            CZ2   CE2
            CA    HA1
