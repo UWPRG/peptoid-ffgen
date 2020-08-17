@@ -4,6 +4,7 @@ import pandas as pd
 import subprocess
 import shutil
 from gauss_utils import *
+from gromacs_utils import *
 
 from utils import *
 
