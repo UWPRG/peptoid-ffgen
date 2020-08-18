@@ -52,6 +52,7 @@
            HA1   HB2     0.09 21
            HA2   HB2     0.09 22
  [ bonds ]
+            CLP  +CA
            CLP   NL
            NL    CA
            CLP   OL
@@ -78,7 +79,7 @@
            CA    +CLP
  [ impropers ]
            NL    CLP  CA  CB
-           CLP   -CA  NL  OL
+           CLP   +CA  NL  OL
 
 ; LTC (CH3 terminated c-term)
 ;
@@ -127,6 +128,7 @@
            HR2 HA3     0.09 22
            HR3 HA3     0.09 23
  [ bonds ]
+            CLP  +CA
            CLP   NR
            NR    CR
            CLP   OL
@@ -154,7 +156,7 @@
            CZ1   HZ1
            CZ2   HZ2
  [ impropers ]
-           CLP  -CA   NR  OL
+           CLP  +CA   NR  OL
            NR    CLP  CR  CB
 
 ; LTN (CH3 terminated n-term)
@@ -235,7 +237,6 @@
            CE2   HE2
            CZ1   HZ1
            CZ2   HZ2
-           CA    +CLP
  [ impropers ]
            CLP   CL  NL  OL
            NL    CLP CA  CB

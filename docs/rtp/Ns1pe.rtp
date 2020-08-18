@@ -48,6 +48,7 @@
            HC    HGR61   0.15 22
 
  [ bonds ]
+            CLP  +CA
            CLP   NL
            CLP   OL
            NL    CA
@@ -71,10 +72,9 @@
            CD2   HD2
            CE1   HE1
            CE2   HE2
-           CA   +CLP
  [ impropers ]
            NL   CLP   CA   CB
-           CLP  -CA   NL   OL
+           CLP  +CA   NL   OL
 
 ; ATC (CH3 terminated c-term)
 ;
@@ -119,6 +119,7 @@
            HC    HGR61   0.15 22
 
  [ bonds ]
+            CLP  +CA
            CLP   NL
            CLP   OL
            NL    CR
@@ -145,7 +146,7 @@
            CE2   HE2
  [ impropers ]
            NL   CLP   CR    CB1
-           CLP  -CA   NL    OL
+           CLP  +CA   NL    OL
 
 ; ATN (MIDDLE)
 ;
@@ -221,7 +222,6 @@
            CD2   HD2
            CE1   HE1
            CE2   HE2
-           CA   +CLP
  [ impropers ]
            NL   CLP   CA    CB1
            CLP  CL    NL    OL
@@ -274,6 +274,7 @@
            HN2   HGP1    0.31 27
 
  [ bonds ]
+            CLP  +CA
            CLP   NL
            CLP   OL
            NL    CA
@@ -305,7 +306,7 @@
 
  [ impropers ]
            NL   CLP   CA   CB1
-           CLP  -CA   NL   OL
+           CLP  +CA   NL   OL
            CP2  CA1   NT   OL2
 
 ; ATB (NH terminated n-term)
@@ -372,5 +373,4 @@
            CD2   HD2
            CE1   HE1
            CE2   HE2
-           CA   +CLP
  [ impropers ] ; no improper dihed at n-term
