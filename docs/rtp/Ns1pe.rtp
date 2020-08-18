@@ -33,8 +33,8 @@
            HB1   HA2     0.09 7
            CB2   CT3    -0.27 8
            HB2   HA3     0.09 9
-           HB3   HGA3    0.09 10
-           HB4   HGA3    0.09 11
+           HB3   HA3    0.09 10
+           HB4   HA3    0.09 11
            CG    CG2R61  0.00 12
            CD1   CG2R61 -0.15 13
            HD1   HGR61   0.15 14
@@ -104,8 +104,8 @@
            HB1   HA2     0.09 7
            CB2   CT3    -0.27 8
            HB2   HA3     0.09 9
-           HB3   HGA3    0.09 10
-           HB4   HGA3    0.09 11
+           HB3   HA3    0.09 10
+           HB4   HA3    0.09 11
            CG    CG2R61  0.00 12
            CD1   CG2R61 -0.15 13
            HD1   HGR61   0.15 14
@@ -180,8 +180,8 @@
            HB1   HA2     0.09 7
            CB2   CT3    -0.27 8
            HB2   HA3     0.09 9
-           HB3   HGA3    0.09 10
-           HB4   HGA3    0.09 11
+           HB3   HA3    0.09 10
+           HB4   HA3    0.09 11
            CG    CG2R61  0.00 12
            CD1   CG2R61 -0.15 13
            HD1   HGR61   0.15 14
@@ -254,8 +254,8 @@
            HB1   HA2     0.09 7
            CB2   CT3    -0.27 8
            HB2   HA3     0.09 9
-           HB3   HGA3    0.09 10
-           HB4   HGA3    0.09 11
+           HB3   HA3    0.09 10
+           HB4   HA3    0.09 11
            CG    CG2R61  0.00 12
            CD1   CG2R61 -0.15 13
            HD1   HGR61   0.15 14
@@ -334,8 +334,8 @@
            HB1   HA2     0.09 6
            CB2   CT3    -0.27 7
            HB2   HA3     0.09 8
-           HB3   HGA3    0.09 9
-           HB4   HGA3    0.09 10
+           HB3   HA3    0.09 9
+           HB4   HA3    0.09 10
            CG    CG2R61  0.00 11
            CD1   CG2R61 -0.15 12
            HD1   HGR61   0.15 13
