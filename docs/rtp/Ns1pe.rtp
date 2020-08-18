@@ -325,29 +325,28 @@
 ;
 [ ATB ]
  [ atoms ]
-           CLP   TC      0.51 0
-           OL    O      -0.51 1
-           NL    NH1    -0.42 2
-           CA    CT2     0.03 3
-           HA1   HB2     0.09 4
-           HA2   HB2     0.09 5
-           CB1   CT2     0.12 6
-           HB1   HA2     0.09 7
-           CB2   CT3    -0.27 8
-           HB2   HA3     0.09 9
-           HB3   HGA3    0.09 10
-           HB4   HGA3    0.09 11
-           CG    CG2R61  0.00 12
-           CD1   CG2R61 -0.15 13
-           HD1   HGR61   0.15 14
-           CD2   CG2R61 -0.15 15
-           HD2   HGR61   0.15 16
-           CE1   CG2R61 -0.15 17
-           HE1   HGR61   0.15 18
-           CE2   CG2R61 -0.15 19
-           HE2   HGR61   0.15 20
-           CH    CG2R61 -0.15 21
-           HC    HGR61   0.15 22
+           NL    NH1    -0.62 0
+           HN1     H     0.20 1
+           CA    CT2     0.03 2
+           HA1   HB2     0.09 3
+           HA2   HB2     0.09 4
+           CB1   CT2     0.12 5
+           HB1   HA2     0.09 6
+           CB2   CT3    -0.27 7
+           HB2   HA3     0.09 8
+           HB3   HGA3    0.09 9
+           HB4   HGA3    0.09 10
+           CG    CG2R61  0.00 11
+           CD1   CG2R61 -0.15 12
+           HD1   HGR61   0.15 13
+           CD2   CG2R61 -0.15 14
+           HD2   HGR61   0.15 15
+           CE1   CG2R61 -0.15 16
+           HE1   HGR61   0.15 17
+           CE2   CG2R61 -0.15 18
+           HE2   HGR61   0.15 19
+           CH    CG2R61 -0.15 20
+           HC    HGR61   0.15 21
 
  [ bonds ]
            CLP   NL
