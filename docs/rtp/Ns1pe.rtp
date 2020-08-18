@@ -73,7 +73,7 @@
            CE1   HE1
            CE2   HE2
  [ impropers ]
-           NL   CLP   CA   CB
+           NL   CLP   CA   CB1
            CLP  +CA   NL   OL
 
 ; ATC (CH3 terminated c-term)
@@ -307,7 +307,7 @@
  [ impropers ]
            NL   CLP   CA   CB1
            CLP  +CA   NL   OL
-           CP2  CA1   NT   OL2
+           CP2  CA   NT   OL2
 
 ; ATB (NH terminated n-term)
 ;
