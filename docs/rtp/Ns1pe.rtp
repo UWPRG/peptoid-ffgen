@@ -1,4 +1,4 @@
-; N-[1-phenylethyl glycine] (Ns1pe)
+; (S)-N-[1-phenylethyl glycine] (Ns1pe)
 ;
 ; ## CONTENTS ###
 ; ATM : middle polymer
@@ -97,8 +97,8 @@
            OL    O      -0.51 1
            NL    NH1    -0.42 2
            CR    CT3    -0.06 3
-           HA1   HA2     0.09 4
-           HA2   HA2     0.09 5
+           HR1   HA2     0.09 4
+           HR2   HA2     0.09 5
            HR3   HA3     0.09 6
            CB1   CT2     0.12 6
            HB1   HA2     0.09 7
@@ -148,7 +148,7 @@
            NL   CLP   CR    CB1
            CLP  +CA   NL    OL
 
-; ATN (MIDDLE)
+; ATN (CH3 terminated n-term)
 ;
 ;                    CH
 ;                   /   \
@@ -164,7 +164,7 @@
 ;        |
 ;        HL3
 
-[ ATM ]
+[ ATN ]
  [ atoms ]
            CL    CT3    -0.27 0
            HL1   HA3     0.09 1
