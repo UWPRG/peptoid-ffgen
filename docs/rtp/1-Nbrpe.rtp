@@ -142,7 +142,7 @@
 
  [ impropers ]
            CLP +CA   NL  OL
-           CP2  CA1  NT  OL2
+           CP2  CA  NT  OL2
            NL   CLP  CA  CB
 
 ; OTB (NH terminated n-term)
