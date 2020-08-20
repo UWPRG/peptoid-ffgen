@@ -139,6 +139,10 @@
            CD2   HD2
            CE1   HE1
            CE2   HE2
+           CP2   OL2
+           CP2   NT
+           NT    HN1
+           NT    HN2 
 
  [ impropers ]
            CLP +CA   NL  OL
