@@ -61,6 +61,8 @@
    CT2       CT2       TC        5   108.000000   435.136000   0.00000000   0.00
 ; for additional side chain chemistries
   CG2R61     CT2      NH1     5   115.200000   443.504000   0.00000000         0.00 ; from CG2R61-CG321-NG2S1
+   CT3       CT2      NH1     5   112.200000   365.681600   0.00000000         0.00 ; from CG331-CG321-NG311
+  CG2R61     CT2      CT3     5   107.500000   433.462400   0.00000000         0.00 ; from CG2R61-CG311-CG331
 
 [ dihedraltypes ]
 ; ### RELEVANT EQUATIONS ###
@@ -137,9 +139,10 @@
      NH1       TC        CT2       HA2       9     0.000     0.0000     1
      NH1       TC        CT2       CT2       9     0.000000  0.000000   1
 ; additional dihedrals adapted for sidechains
-     CG2R61    CG2R61    CT2       NH1       9     0.000000  0.497896   2 ; from CG2R61   CG2R61    CG321    NG2S1
-     CG2R61    CG2R61    CT2       NH1       9   180.000000  0.552288   4 ; from CG2R61   CG2R61    CG321    NG2S1
-     CG2R61    CG2R61    CT2       NH1       9   180.000000  0.054392   6 ; from CG2R61   CG2R61    CG321    NG2S1
+     CG2R61    CG2R61    CT2       NH1       9     0.000000  0.497896   2 ; from CG2R61-CG2R61-CG321-NG2S1
+     CG2R61    CG2R61    CT2       NH1       9   180.000000  0.552288   4 ; from CG2R61-CG2R61-CG321-NG2S1
+     CG2R61    CG2R61    CT2       NH1       9   180.000000  0.054392   6 ; from CG2R61-CG2R61-CG321-NG2S1
+     CG2R61   CG2R61     CT2       CT3       9   180.000000     0.962320  2 ; from   CG2R61-CG2R61-CG311-CG331
 [ dihedraltypes ]
 ; ### RELEVANT EQUATIONS ###
 ; improper func2 = 1/2 * kphi * (phi - phi0)**2

@@ -54,6 +54,7 @@
            CH    CG2R61 -0.03 21
            BRL   BRGR1  -0.10 22
  [ bonds ]
+          CLP  +CA
            CLP   NL
            CLP   OL
            NL    CA
@@ -128,6 +129,7 @@
            HR2 HA3     0.09 22
            HR3 HA3     0.09 23
  [ bonds ]
+           CLP  +CA
            CLP   NL
            NL    CR
            CLP   OL
@@ -154,7 +156,7 @@
            CZ2   HZ2
 
   [ impropers ]
-           CLP  -CA   NL  OL
+           CLP  +CA   NL  OL
            NL    CLP  CR  CB
 
 ; BTN (CH3 terminated n-term)
@@ -235,7 +237,7 @@
            CE2   HE2
            CZ1   HZ1
            CZ2   HZ2
-           CA   +CLP
+
  [ impropers ]
            CLP   CL  NL  OL
            NL    CLP CA  CB
@@ -321,7 +323,7 @@
            NT    HN1
            NT    HN2
  [ impropers ]
-           CLP  -CA   NL  OL
+           CLP  +CA   NL  OL
            CP2   CA   NT  OL2
            NL    CLP  CA  CB
 
@@ -390,7 +392,7 @@
            CE2   HE2
            CZ1   HZ1
            CZ2   HZ2
-           CA   +CLP
+
  [ impropers ] ; no improper dihed at n-term
 
 ; BLM (middle w/ LP)
@@ -440,6 +442,7 @@
            LP    LPH     0.05 23
 
  [ bonds ]
+           CLP  +CA
            CLP   NL
            NL    CA
            CLP   OL
@@ -463,10 +466,9 @@
            CE2   HE2
            CZ1   HZ1
            CZ2   HZ2
-           CA   +CLP
  [ impropers ]
            NL    CLP  CA  CB
-           CLP   -CA  NL  OL
+           CLP   +CA  NL  OL
 
 ; BLV (CH2-CO-NH2 terminated c-term w/ LP)
 ;
@@ -490,7 +492,7 @@
 ;                                  |
 ;                                  HN2
 
-[ BTV ]
+[ BLV ]
  [ atoms ]
           CLP  TC      0.51 0
            OL  O      -0.51 1
@@ -515,13 +517,14 @@
            HZ2 HGR61   0.14 20
            CH  CG2R61 -0.02 21
            BRL BRGR1  -0.16 22
-           CP2 TC      0.51 23
-           OL2 O      -0.51 24
-            NT NG2S2  -0.62 25
-           HN1 HGP1    0.31 26
-           HN2 HGP1    0.31 27
-           LP  LPH     0.05 28
+           LP  LPH     0.05 23
+           CP2 TC      0.51 24
+           OL2 O      -0.51 25
+            NT NG2S2  -0.62 26
+           HN1 HGP1    0.31 27
+           HN2 HGP1    0.31 28
  [ bonds ]
+          CLP  +CA
           CLP    NL
           CLP    OL
            NL    CB
@@ -551,7 +554,7 @@
            NT    HN1
            NT    HN2
  [ impropers ]
-           CLP  -CA    NL   OL
+           CLP  +CA    NL   OL
            CP2   CA    NT   OL2
            NL    CLP   CA   CB
 
@@ -575,7 +578,7 @@
 ;                 |
 ;           HN1-- NL -- CA --\
 
-[ BTB ]
+[ BLB ]
  [ atoms ]
          NL    NH1    -0.65 0 ; adjusted for NH backbone (cgenff)
          HN1   H       0.33 1 ; comes from NH backbone   (cgenff)
@@ -623,5 +626,4 @@
            CE2   HE2
            CZ1   HZ1
            CZ2   HZ2
-           CA   +CLP
  [ impropers ] ; no improper dihed at n-term
