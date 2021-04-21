@@ -49,6 +49,8 @@
     CT2       NH1      CT2     5   120.0000     418.400  0.0      0.0
     HC        NH1      CT2     5   109.5000     251.040  0.207400 16736.00
     CT2       CT2      CA      5   107.5000     433.4624 0.0      0.0
+		CT2       CT2      CG2R61  5   107.5000     433.4624 0.0      0.0
+
 ; additional angles needed for NH2 termini (Sarah Alamdari)
    NG2S2     TC        O         5   122.500      627.600      0.23700      41840.000
    TC        NG2S2     HGP1      5   120.000      418.400      0.00000      0.000

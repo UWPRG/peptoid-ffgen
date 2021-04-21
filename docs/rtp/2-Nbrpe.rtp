@@ -62,7 +62,8 @@
            CB    CG
            CG    CD
            CD    CE1
-           CE1   CZ1
+           CD	   CE2	
+					 CE1   CZ1
            CZ1   CH
            CH    BRL
            CH    CZ2
@@ -77,10 +78,9 @@
            CE2   HE2
            CZ1   HZ1
            CZ2   HZ2
-           CA   +CLP
  [ impropers ]
            NL    CLP  CA  CB
-           CLP  -CA   NL  OL
+           CLP  +CA   NL  OL
 
 ; BTC (CH3 terminated c-term)
 ;
