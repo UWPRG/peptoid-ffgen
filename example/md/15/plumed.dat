@@ -1,0 +1,24 @@
+# vim:ft=plumed
+
+### DIHEDRALS ###
+# 
+# omega (planar amide bond) controls backbone cis/trans 
+# omega = 0 -> cis 
+# omega = 180 -> trans
+omega1: TORSION ATOMS=12,7,5,1 # (MAIN OMEGA)
+omega2: TORSION ATOMS=18,17,15,12 
+
+# psi
+psi: TORSION ATOMS=17,15,12,7
+
+# phi
+phi: TORSION ATOMS=15,12,7,5
+
+#roe
+roe: TORSION ATOMS=15,12,7,8
+
+ene: ENERGY 
+
+rest_phi: RESTRAINT ARG=phi AT=XXX KAPPA=4184
+
+PRINT ARG=* STRIDE=1 FILE=COLVAR

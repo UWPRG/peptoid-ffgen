@@ -1,0 +1,49 @@
+GROMACS
+;       Energy Minimization Script
+;
+;
+; Energy Minimizing Stuff
+;
+constraints     = none
+integrator      = cg            ; steepest decents minimum (else cg)
+nsteps          = 50000
+emtol           = 0.000001          ; convergence total force(kJ/mol/nm) is smaller than
+emstep          = 0.001         ; initial step size (nm)
+; T and P coupling
+Tcoupl          = no            ; temperature coupling
+Pcoupl          = no            ; pressure coupling
+gen_vel         = no
+;
+; Neighbour Searching ( VAC SIMULATIONS)
+ns_type                 = simple
+pbc                     = no 
+nstlist                 = 0 
+;
+; Removing CM Translation and Rotation (VAC SIMULATIONS)
+comm_mode               = Angular
+nstcomm                 = 1
+;
+; Output Control (To get PE)
+;
+nstlog                  = 1
+nstenergy               = 1
+nstxout                 = 1
+nstxtcout               = 1
+nstvout                 = 0
+nstfout                 = 0
+;
+; Interactions 
+cutoff-scheme		= group
+;
+; Electrostatic
+rlist                   = 0.0
+rcoulomb                = 0.0 ; for vac
+coulombtype             = cut-off
+;
+; Van der Waals
+vdw-type                = cut-off
+rvdw                    = 0.0 ; for vac
+;
+; Freeze Groups
+freezegrps 			= SCAN
+freezedim				= Y Y Y
